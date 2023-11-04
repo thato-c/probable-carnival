@@ -10,5 +10,7 @@ namespace ProductManager.Models
 
         [Column(TypeName = "decimal(10, 2")]
         public decimal Cost { get; set; }
+
+        public ICollection<LicencePurchase> LicencePurchase { get; set; }
     }
 }
