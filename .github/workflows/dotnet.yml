@@ -27,3 +27,6 @@ jobs:
       
     - name: Build
       run: dotnet build ProductManager/ProductManager/ProductManager.csproj --no-restore
+
+    - name: Test
+      run: dotnet test ProductManager/ProductManager.Tests/ProductManager.Tests.csproj --no-build --verbosity normal
