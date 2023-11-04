@@ -23,7 +23,7 @@ jobs:
         dotnet-version: 6.0.x
         
     - name: Restore dependencies
-      run: dotnet restore ProjectManager/ProjectManager.sln
+      run: dotnet restore ProductManager/ProductManager.sln
       
     - name: Build
-      run: dotnet build ProjectManager/ProjectManager/ProjectManager.csproj --no-restore
+      run: dotnet build ProductManager/ProductManager/ProductManager.csproj --no-restore
