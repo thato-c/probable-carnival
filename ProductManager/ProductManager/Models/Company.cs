@@ -18,6 +18,7 @@ namespace ProductManager.Models
         [Required(ErrorMessage = "Company Email is required")]
         [EmailAddress]
         public string CompanyEmail { get; set; } = string.Empty;
-        public ICollection<LicencePurchase> LicencePurchase { get; set; }
+
+        public ICollection<LicencePurchase> LicencePurchases { get; set; }
     }
 }

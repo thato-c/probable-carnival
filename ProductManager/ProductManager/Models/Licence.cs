@@ -24,6 +24,6 @@ namespace ProductManager.Models
         [Range(1, int.MaxValue, ErrorMessage = "Validity monthss must be greater than or equal to 1")]
         public int ValidityMonths { get; set; } = 1;
 
-        public ICollection<LicencePurchase> LicencePurchase { get; set; }
+        public ICollection<LicencePurchase> LicencePurchases { get; set; }
     }
 }
