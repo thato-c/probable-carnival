@@ -8,9 +8,11 @@ namespace ProductManager.Models
         [Key]
         public int PurchaseId { get; set; }
 
+        [Required]
         public int Quantity { get; set; }
 
-        public DateTime PurchaseDate { get; set; }
+        [Required]
+        public DateTime PurchaseDate { get; set; } = DateTime.Now;
 
         [Column(TypeName = "decimal(10, 2)")]
         public decimal TotalCost { get; set; }
