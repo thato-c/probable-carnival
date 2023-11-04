@@ -1,0 +1,54 @@
+﻿@model List<Licence>
+@{
+}
+
+<h2>Licences</h2>
+
+<br />
+    <a asp-controller="Licence" asp-action="Create">Create New Licence</a>
+<br />
+<br />
+
+@if (Model != null)
+{
+    <table class="table">
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                Cost
+            </th>
+            <th>
+                Duration (Months)
+            </th>
+        </tr>
+        @foreach (var licence in Model)
+        {
+            if (licence != null)
+            {
+                <tr>
+                    <td>
+                        @licence.Name
+                    </td>
+                    <td>
+                        @licence.Description
+                    </td>
+                    <td>
+                        @licence.Cost
+                    </td>
+                    <td>
+                        @licence.ValidityMonths
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+}
+else
+{
+    <p>@ViewBag.Message</p>
+}
