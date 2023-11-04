@@ -8,7 +8,8 @@ namespace ProductManager.Models
         [Key]
         public int PurchaseId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Licence Quantity is required")]
+        [Range(1, int.MaxValue)]
         public int Quantity { get; set; }
 
         [Required]
