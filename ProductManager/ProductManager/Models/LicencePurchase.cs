@@ -9,13 +9,14 @@ namespace ProductManager.Models
         public int PurchaseId { get; set; }
 
         [Required(ErrorMessage = "Licence Quantity is required")]
-        [Range(1, int.MaxValue)]
+        [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than or equal to 1")]
         public int Quantity { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Purchase Date is required")]
         public DateTime PurchaseDate { get; set; } = DateTime.Now;
 
         [Column(TypeName = "decimal(10, 2)")]
+        [Range(0, double.MaxValue, ErrorMessage = "Total Cost must be a non-negative value")]
         public decimal TotalCost { get; set; }
 
         public int CompanyId { get; set; }
