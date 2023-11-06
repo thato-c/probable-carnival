@@ -20,7 +20,12 @@ namespace ProductManager.Controllers
         public async Task<IActionResult> Index()
         {
             var viewModel = new LicencePurchaseViewModel();
+            await SetDefaultLicence(viewModel);
+            return View(viewModel);
+        }
 
+        private async Task SetDefaultLicence(LicencePurchaseViewModel viewModel)
+        {
             var licence = await _context.Licences.FirstOrDefaultAsync(l => l.LicenceId == 1);
 
             if (licence != null)
@@ -32,9 +37,7 @@ namespace ProductManager.Controllers
             {
                 viewModel.LicenceDetails = new LicenceViewModel();
                 viewModel.LicenceDetails.Name = "Default Licence Name";
-            } 
-
-            return View(viewModel);
+            }
         }
     }
 }
