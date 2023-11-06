@@ -13,7 +13,7 @@ public class LicenceControllerTests : IDisposable
     {
         // Configure DbContextOptions with the SQL Server connection string for your test database
         _options = new DbContextOptionsBuilder<ApplicationDBContext>()
-            .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=ProductManager;Trusted_Connection=True;MultipleActiveResultSets=true")
+            .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=ProductManager_Test;Trusted_Connection=True;MultipleActiveResultSets=true")
             .Options;
 
         using (var context = new ApplicationDBContext(_options))
