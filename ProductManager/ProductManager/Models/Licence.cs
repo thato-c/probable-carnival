@@ -21,7 +21,7 @@ namespace ProductManager.Models
         public decimal Cost { get; set; }
 
         [Required(ErrorMessage = "Licence Duration is required")]
-        [Range(1, int.MaxValue, ErrorMessage = "Validity monthss must be greater than or equal to 1")]
+        [Range(1, int.MaxValue, ErrorMessage = "Validity months must be greater than or equal to 1")]
         public int ValidityMonths { get; set; } = 1;
 
         public ICollection<LicencePurchase> LicencePurchases { get; set; }
