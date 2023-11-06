@@ -1,5 +1,52 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using ProductManager.ViewModels;
+@model LicencePurchaseViewModel
 @{
 }
+
+<h1>Purchase a Licence</h1>
+
+<form asp-controller="LicencePurchase" asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="CompanyDetails.Name">Company Name</label>
+        <input asp-for="CompanyDetails.Name" class="form-control" />
+        <span asp-validation-for="CompanyDetails.Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CompanyDetails.PhoneNumber">Phone</label>
+        <input asp-for="CompanyDetails.PhoneNumber" class="form-control" />
+        <span asp-validation-for="CompanyDetails.PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CompanyDetails.Email">Email</label>
+        <input asp-for="CompanyDetails.Email" class="form-control" />
+        <span asp-validation-for="CompanyDetails.Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LicenceDetails.Name">Licence</label>
+        <input asp-for="LicenceDetails.Name" class="form-control" value="Basic" readonly/>
+        <span asp-validation-for="LicenceDetails.Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Quantity">Quantity</label>
+        <input asp-for="Quantity" class="form-control" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PurchaseDate">Date</label>
+        <input asp-for="PurchaseDate" class="form-control" readonly/>
+        <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TotalCost">Total Cost</label>
+        <input asp-for="TotalCost" class="form-control" readonly />
+        <span asp-validation-for="TotalCost" class="text-danger"></span>
+    </div>
+
+    <button type="submit">Purchase Licence</button>
+</form>
