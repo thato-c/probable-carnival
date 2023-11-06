@@ -20,6 +20,7 @@ namespace ProductManager.Controllers
         public async Task<IActionResult> Index()
         {
             var viewModel = new LicencePurchaseViewModel();
+
             await SetDefaultLicence(viewModel);
             return View(viewModel);
         }
@@ -32,11 +33,15 @@ namespace ProductManager.Controllers
             {
                 viewModel.LicenceDetails = new LicenceViewModel();
                 viewModel.LicenceDetails.Name = licence.Name;
+                viewModel.Quantity = 1;
+                viewModel.TotalCost = viewModel.Quantity * licence.Cost;
             }
             else
             {
                 viewModel.LicenceDetails = new LicenceViewModel();
                 viewModel.LicenceDetails.Name = "Default Licence Name";
+                viewModel.Quantity = 1;
+                viewModel.TotalCost = licence.Cost;
             }
         }
     }
