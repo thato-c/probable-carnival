@@ -33,6 +33,7 @@ namespace ProductManager.Controllers
             {
                 viewModel.LicenceDetails = new LicenceViewModel();
                 viewModel.LicenceDetails.Name = licence.Name;
+                viewModel.LicenceDetails.Cost = licence.Cost;
                 viewModel.Quantity = 1;
                 viewModel.TotalCost = viewModel.Quantity * licence.Cost;
             }
@@ -40,6 +41,7 @@ namespace ProductManager.Controllers
             {
                 viewModel.LicenceDetails = new LicenceViewModel();
                 viewModel.LicenceDetails.Name = "Default Licence Name";
+                viewModel.LicenceDetails.Cost = licence.Cost;
                 viewModel.Quantity = 1;
                 viewModel.TotalCost = licence.Cost;
             }
