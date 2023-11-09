@@ -25,6 +25,17 @@ namespace ProductManager.Controllers
             return View(viewModel);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(LicencePurchaseViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                return RedirectToAction("Index");
+            }
+            return View("Index", model);
+        }
+
         private async Task SetDefaultLicence(LicencePurchaseViewModel viewModel)
         {
             var licence = await _context.Licences.FirstOrDefaultAsync(l => l.LicenceId == 1);
