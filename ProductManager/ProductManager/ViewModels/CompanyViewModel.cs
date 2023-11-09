@@ -4,9 +4,8 @@ namespace ProductManager.ViewModels
 {
     public class CompanyViewModel
     {
-        
-        [StringLength(50)]
         [Required(ErrorMessage = "Company Name is required")]
+        [StringLength(50)]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Company phone number is required")]
