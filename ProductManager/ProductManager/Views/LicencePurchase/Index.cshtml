@@ -6,6 +6,8 @@
 <h1>Purchase a Licence</h1>
 
 <form asp-controller="LicencePurchase" asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
     <div class="form-group">
         <label asp-for="CompanyDetails.Name">Company Name</label>
         <input asp-for="CompanyDetails.Name" class="form-control" />
@@ -25,9 +27,9 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="LicenceDetails.Name">Licence</label>
-        <input asp-for="LicenceDetails.Name" class="form-control" readonly/>
-        <span asp-validation-for="LicenceDetails.Name" class="text-danger"></span>
+        <label asp-for="LicenceName">Licence</label>
+        <input asp-for="LicenceName" class="form-control" readonly/>
+        <span asp-validation-for="LicenceName" class="text-danger"></span>
     </div>
 
     <div class="form-group">
@@ -71,7 +73,7 @@
             quantityInput.value = parseInt(quantityInput.value) - 1;
 
             var quantity = parseInt(quantityInput.value);
-            var cost = @Html.Raw(Json.Serialize(Model.LicenceDetails.Cost));
+            var cost = @Html.Raw(Json.Serialize(Model.LicenceCost));
 
             if (!isNaN(quantity)) {
                 var totalCost = parseFloat(quantity) * parseFloat(cost);
@@ -89,7 +91,7 @@
         quantityInput.value = parseInt(quantityInput.value) + 1;
         
         var quantity = parseInt(quantityInput.value);
-        var cost = @Html.Raw(Json.Serialize(Model.LicenceDetails.Cost));
+        var cost = @Html.Raw(Json.Serialize(Model.LicenceCost));
 
         if (!isNaN(quantity)){
             var totalCost = parseFloat(quantity) * parseFloat(cost);
