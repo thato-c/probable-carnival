@@ -1,0 +1,32 @@
+﻿@using ProductManager.ViewModels;
+@model UserViewModel
+@{
+}
+
+<h2>User Registration</h2>
+
+<form asp-controller="LicencePurchase" asp-action="CreatePost" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Quantity" />
+    <input type="hidden" asp-for="CompanyId" />
+
+    @{
+        // Loop to generate user input elements based on quantity
+        for (int licenceQuantity = 0; licenceQuantity < Model.Quantity; licenceQuantity++)
+        {
+            <div style="display: inline-block; width: 500px;">
+                <label asp-for="Users[licenceQuantity].Username">UserName</label>
+                <input asp-for="Users[licenceQuantity].Username" class="form-control" />
+                <span asp-validation-for="Users[licenceQuantity].Username" class="text-danger"></span>
+            </div>
+
+            <div style="display: inline-block; width: 500px;">
+                <label asp-for="Users[licenceQuantity].Password">Password</label>
+                <input asp-for="Users[licenceQuantity].Password" class="form-control" />
+                <span asp-validation-for="Users[licenceQuantity].Password" class="text-danger"></span>
+            </div>
+        }
+    }
+    <br />
+    <button type="submit">Purchase Licence</button>
+</form>

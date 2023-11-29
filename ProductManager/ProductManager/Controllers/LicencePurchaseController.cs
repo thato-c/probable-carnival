@@ -1,16 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Packaging.Licenses;
+using Microsoft.Identity.Client;
 using ProductManager.Data;
 using ProductManager.Models;
 using ProductManager.ViewModels;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace ProductManager.Controllers
 {
     public class LicencePurchaseController : Controller
     {
-
         private readonly ApplicationDBContext _context;
 
         public LicencePurchaseController(ApplicationDBContext context)
@@ -26,6 +24,8 @@ namespace ProductManager.Controllers
             return View(viewModel);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LicencePurchaseViewModel model) 
         {
             if (ModelState.IsValid)
@@ -59,7 +59,20 @@ namespace ProductManager.Controllers
                     _context.LicencePurchases.Add(LicencePurchase);
                     await _context.SaveChangesAsync();
 
-                    return RedirectToAction("Index");
+                    // Map the Quantity to the User entity
+                    var UserViewModel = new UserViewModel
+                    {
+                        CompanyId = Company.CompanyId,
+                        Quantity = model.Quantity,
+                        Users = new List<UserRegistrationViewModel>()
+                    };
+
+                    for (int i = 0; i < model.Quantity; i++)
+                    {
+                        UserViewModel.Users.Add(new UserRegistrationViewModel());
+                    }
+
+                    return View(UserViewModel);
                 }
                 catch (DbUpdateException ex)
                 {
@@ -76,6 +89,35 @@ namespace ProductManager.Controllers
                 }
             }
             return View("Index", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreatePost(UserViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                for (int i = 0; i < viewModel.Quantity; i++)
+                {
+                    var user = new User
+                    {
+                        CompanyId = viewModel.CompanyId,
+                        Username = viewModel.Users[i].Username,
+                        Password = viewModel.Users[i].Password
+                    };
+
+                    // Add the user to the database
+                    _context.Users.Add(user);
+                }
+
+                // Save the changes to the database
+                _context.SaveChanges();
+                return RedirectToAction("Index", "Home");
+            } 
+            else
+            {
+                return View("Create", viewModel);
+            }
         }
 
         private async Task SetDefaultLicence(LicencePurchaseViewModel viewModel)

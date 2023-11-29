@@ -20,5 +20,6 @@ namespace ProductManager.Models
         public string CompanyEmail { get; set; } = string.Empty;
 
         public ICollection<LicencePurchase> LicencePurchases { get; set; }
+        public ICollection<User> Users { get; set; }
     }
 }

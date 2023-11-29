@@ -6,16 +6,19 @@ namespace ProductManager.ViewModels
 {
     public class LicencePurchaseViewModel
     {
+
+        // Company properties
         public CompanyViewModel CompanyDetails { get; set; }
 
         [Required(ErrorMessage = "Licence name is required")]
         public string LicenceName { get; set; }
 
+        // Licence properties
         [Column(TypeName = "decimal(10, 2)")]
         [Required(ErrorMessage = "Licence Cost is required")]
         public decimal LicenceCost { get; set; }
 
-        // Licence purchase information
+        // Licence purchase properties
         [Required(ErrorMessage = "Licence Quantity is required")]
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than or equal to 1")]
         public int Quantity { get; set; }
