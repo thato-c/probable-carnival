@@ -30,63 +30,77 @@ namespace ProductManager.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Map viewModel to Company entity
-                var Company = new Models.Company
+                // Check if the Company already exists
+                var existingCompany = await _context.Companies.FirstOrDefaultAsync(c => 
+                    c.CompanyName == model.CompanyDetails.Name ||
+                    c.CompanyEmail == model.CompanyDetails.Email ||
+                    c.CompanyPhoneNumber == model.CompanyDetails.PhoneNumber);
+
+                if (existingCompany != null)
                 {
-                    CompanyName = model.CompanyDetails.Name,
-                    CompanyEmail = model.CompanyDetails.Email,
-                    CompanyPhoneNumber = model.CompanyDetails.PhoneNumber,
-                };
-
-                try
-                {
-                    // Add and save the new licence to the database
-                    _context.Companies.Add(Company);
-                    await _context.SaveChangesAsync();
-
-                    // Map the viewModel to LicencePurchase entity
-                    var licenceId = await GetLicenceId(model.LicenceName);
-                    var LicencePurchase = new Models.LicencePurchase
-                    {
-                        Quantity = model.Quantity,
-                        PurchaseDate = model.PurchaseDate,
-                        TotalCost = model.TotalCost,
-                        CompanyId = Company.CompanyId,
-                        LicenceId = licenceId,
-                    };
-
-                    // Add and save the new licence purchase to the database
-                    _context.LicencePurchases.Add(LicencePurchase);
-                    await _context.SaveChangesAsync();
-
-                    // Map the Quantity to the User entity
-                    var UserViewModel = new UserViewModel
-                    {
-                        CompanyId = Company.CompanyId,
-                        Quantity = model.Quantity,
-                        Users = new List<UserRegistrationViewModel>()
-                    };
-
-                    for (int i = 0; i < model.Quantity; i++)
-                    {
-                        UserViewModel.Users.Add(new UserRegistrationViewModel());
-                    }
-
-                    return View(UserViewModel);
-                }
-                catch (DbUpdateException ex)
-                {
-                    // Log the exception details
-                    Console.WriteLine($"DbUpdateException: {ex.Message}");
-                    Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
-
-                    // Optionally, log additional details
-                    // Log the SQL statement causing the exception
-                    Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
-
-                    ModelState.AddModelError("", "An error occurred while saving data to the database.");
+                    ModelState.AddModelError("", "Company with the same details already exists.");
                     return View("Index", model);
-                }
+                } 
+                else
+                {
+                    // Map viewModel to Company entity
+                    var Company = new Models.Company
+                    {
+                        CompanyName = model.CompanyDetails.Name,
+                        CompanyEmail = model.CompanyDetails.Email,
+                        CompanyPhoneNumber = model.CompanyDetails.PhoneNumber,
+                    };
+
+                    try
+                    {
+                        // Add and save the new licence to the database
+                        _context.Companies.Add(Company);
+                        await _context.SaveChangesAsync();
+
+                        // Map the viewModel to LicencePurchase entity
+                        var licenceId = await GetLicenceId(model.LicenceName);
+                        var LicencePurchase = new Models.LicencePurchase
+                        {
+                            Quantity = model.Quantity,
+                            PurchaseDate = model.PurchaseDate,
+                            TotalCost = model.TotalCost,
+                            CompanyId = Company.CompanyId,
+                            LicenceId = licenceId,
+                        };
+
+                        // Add and save the new licence purchase to the database
+                        _context.LicencePurchases.Add(LicencePurchase);
+                        await _context.SaveChangesAsync();
+
+                        // Map the Quantity to the User entity
+                        var UserViewModel = new UserViewModel
+                        {
+                            CompanyId = Company.CompanyId,
+                            Quantity = model.Quantity,
+                            Users = new List<UserRegistrationViewModel>()
+                        };
+
+                        for (int i = 0; i < model.Quantity; i++)
+                        {
+                            UserViewModel.Users.Add(new UserRegistrationViewModel());
+                        }
+
+                        return View(UserViewModel);
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        // Log the exception details
+                        Console.WriteLine($"DbUpdateException: {ex.Message}");
+                        Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+
+                        // Optionally, log additional details
+                        // Log the SQL statement causing the exception
+                        Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+
+                        ModelState.AddModelError("", "An error occurred while saving data to the database.");
+                        return View("Index", model);
+                    }
+                }  
             }
             return View("Index", model);
         }
