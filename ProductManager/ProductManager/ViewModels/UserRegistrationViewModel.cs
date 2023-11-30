@@ -10,6 +10,8 @@ namespace ProductManager.ViewModels
 
         [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", 
+            ErrorMessage = "Password must meet the recommended strength.")]
         public string Password { get; set; }
 
         public int CompanyId { get; set; }
