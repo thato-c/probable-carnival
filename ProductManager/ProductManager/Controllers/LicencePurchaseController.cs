@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
+using BCrypt.Net;
 using ProductManager.Data;
 using ProductManager.Models;
 using ProductManager.ViewModels;
@@ -99,11 +99,13 @@ namespace ProductManager.Controllers
             {
                 for (int i = 0; i < viewModel.Quantity; i++)
                 {
+                    var hashedPassword = BCrypt.Net.BCrypt.HashPassword(viewModel.Users[i].Password);
+
                     var user = new User
                     {
                         CompanyId = viewModel.CompanyId,
                         Username = viewModel.Users[i].Username,
-                        Password = viewModel.Users[i].Password
+                        Password = hashedPassword
                     };
 
                     // Add the user to the database
