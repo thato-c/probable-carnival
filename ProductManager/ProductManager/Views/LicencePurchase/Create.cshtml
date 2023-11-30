@@ -12,18 +12,26 @@
 
     @{
         // Loop to generate user input elements based on quantity
-        for (int licenceQuantity = 0; licenceQuantity < Model.Quantity; licenceQuantity++)
+        for (int licenceNumber = 0; licenceNumber < Model.Quantity; licenceNumber++)
         {
             <div style="display: inline-block; width: 500px;">
-                <label asp-for="Users[licenceQuantity].Username">UserName</label>
-                <input asp-for="Users[licenceQuantity].Username" class="form-control" />
-                <span asp-validation-for="Users[licenceQuantity].Username" class="text-danger"></span>
+                <label asp-for="Users[licenceNumber].Username">UserName</label>
+                <input asp-for="Users[licenceNumber].Username" class="form-control" />
+                <span asp-validation-for="Users[licenceNumber].Username" class="text-danger"></span>
             </div>
 
             <div style="display: inline-block; width: 500px;">
-                <label asp-for="Users[licenceQuantity].Password">Password</label>
-                <input asp-for="Users[licenceQuantity].Password" class="form-control" />
-                <span asp-validation-for="Users[licenceQuantity].Password" class="text-danger"></span>
+                <label asp-for="Users[licenceNumber].Password">Password</label>
+                <div class="input-group">
+                    <input asp-for="Users[licenceNumber].Password" class="form-control" />
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-dark" onclick="togglePassword(this)">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <span asp-validation-for="Users[licenceNumber].Password" class="text-danger"></span>
+                <span id="passwordStrengthMessage" class="text-success"></span>
             </div>
         }
     }
