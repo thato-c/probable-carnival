@@ -113,17 +113,31 @@ namespace ProductManager.Controllers
             {
                 for (int i = 0; i < viewModel.Quantity; i++)
                 {
-                    var hashedPassword = BCrypt.Net.BCrypt.HashPassword(viewModel.Users[i].Password);
+                    var userViewModel = viewModel.Users[i];
 
-                    var user = new User
+                    // Check if the username is unique within the company
+                    var isUsernameUnique = !_context.Users.Any(u =>
+                        u.Username == userViewModel.Username);
+
+                    if (!isUsernameUnique)
                     {
-                        CompanyId = viewModel.CompanyId,
-                        Username = viewModel.Users[i].Username,
-                        Password = hashedPassword
-                    };
+                        ModelState.AddModelError("", $"Email already exists.");
+                        return View("Create", viewModel);
+                    }
+                    else
+                    {
+                        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(viewModel.Users[i].Password);
 
-                    // Add the user to the database
-                    _context.Users.Add(user);
+                        var user = new User
+                        {
+                            CompanyId = viewModel.CompanyId,
+                            Username = viewModel.Users[i].Username,
+                            Password = hashedPassword
+                        };
+
+                        // Add the user to the database
+                        _context.Users.Add(user);
+                    }
                 }
 
                 // Save the changes to the database

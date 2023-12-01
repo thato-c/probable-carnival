@@ -62,6 +62,10 @@
 </form>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        updateTotalCost();
+    });
+
     var quantityInput = document.getElementById("Quantity");
     var totalCostInput = document.getElementById("TotalCost");
     var decrementButton = document.getElementById("decrementQuantity");
@@ -71,29 +75,21 @@
         // Decrement the quantity when the "-" button is clicked
         if (quantityInput.value > 1) {
             quantityInput.value = parseInt(quantityInput.value) - 1;
-
-            var quantity = parseInt(quantityInput.value);
-            var cost = @Html.Raw(Json.Serialize(Model.LicenceCost));
-
-            if (!isNaN(quantity)) {
-                var totalCost = parseFloat(quantity) * parseFloat(cost);
-                totalCost = totalCost.toFixed(2);
-                var formattedValue = totalCost.toString().replace('.', ',');
-                totalCostInput.value = formattedValue;
-            } else {
-                totalCostInput.value = "";
-            }
+            updateTotalCost();
         }
     });
 
     incrementButton.addEventListener("click", function () {
         // Increment the quantity when the "+" button is clicked
         quantityInput.value = parseInt(quantityInput.value) + 1;
-        
+        updateTotalCost();
+    });
+
+    function updateTotalCost(){
         var quantity = parseInt(quantityInput.value);
         var cost = @Html.Raw(Json.Serialize(Model.LicenceCost));
 
-        if (!isNaN(quantity)){
+        if (!isNaN(quantity)) {
             var totalCost = parseFloat(quantity) * parseFloat(cost);
             totalCost = totalCost.toFixed(2);
             var formattedValue = totalCost.toString().replace('.', ',');
@@ -101,5 +97,5 @@
         } else {
             totalCostInput.value = "";
         }
-    });
+    }
 </script>
