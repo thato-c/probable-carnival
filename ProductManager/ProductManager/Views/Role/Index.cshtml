@@ -1,7 +1,42 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model List<Role>
 @{
 }
 
-<h2> Add Roles</h2>
+<h2>Roles</h2>
+
+<br />
+    <a asp-controller="Role" asp-action="Create">Add New Role</a>
+<br />
+<br />
+
+@if (Model != null)
+{
+    <table class="table">
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Description
+            </th>
+        </tr>
+        @foreach (var role in Model)
+        {
+             if (role != null)
+            {
+                <tr>
+                    <td>
+                        @role.Name
+                    </td>
+                    <td>
+                        @role.Description
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+}
+else
+{
+    <p>@ViewBag.Message</p>
+}

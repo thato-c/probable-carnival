@@ -1,0 +1,24 @@
+﻿@using ProductManager.ViewModels
+@model RoleViewModel
+@{
+}
+
+<h1> Add a new Role</h1>
+
+<form asp-controller="Role" asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="Name">Role Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description">Description</label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <button type="submit">Add Role</button>
+</form>
