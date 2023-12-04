@@ -111,13 +111,14 @@ namespace ProductManager.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Keep traack of usernames in the current request
+
+                // Keep track of usernames in the current request
                 var usernamesInRequest = new HashSet<string>();
 
                 for (int i = 0; i < viewModel.Quantity; i++)
                 {
                     var userViewModel = viewModel.Users[i];
-
+                    
                     // Check if the username is unique within the current request
                     if (!usernamesInRequest.Add(userViewModel.Username))
                     {
@@ -149,9 +150,41 @@ namespace ProductManager.Controllers
                         _context.Users.Add(user);
                     }
                 }
-
-                // Save the changes to the database
+                // Save the users to the database
                 _context.SaveChanges();
+
+                // Assign roles
+                for (int i = 0; i < viewModel.Quantity; i++)
+                {
+                    // For user1 assign "Company Admin" Role
+                    if (i == 0)
+                    {
+                        var user = _context.Users.First(u => u.Username == viewModel.Users[i].Username);
+                        var userRole = new Models.UserRole
+                        {
+                            UserId = user.UserId,
+                            RoleId = 4,
+                        };
+
+                        // Add the userRole to the database
+                        _context.UserRoles.Add(userRole);
+                    }
+                    else
+                    {
+                        var user = _context.Users.First(u => u.Username == viewModel.Users[i].Username);
+                        var userRole = new Models.UserRole
+                        {
+                            UserId = user.UserId,
+                            RoleId = 5,
+                        };
+
+                        // Add the userRole to the database
+                        _context.UserRoles.Add(userRole);
+                    }
+                }
+                // Save the roles to the database
+                _context.SaveChanges();
+
                 return RedirectToAction("Index", "Home");
             } 
             else
