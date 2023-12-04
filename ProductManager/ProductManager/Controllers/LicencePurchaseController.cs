@@ -111,9 +111,19 @@ namespace ProductManager.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Keep traack of usernames in the current request
+                var usernamesInRequest = new HashSet<string>();
+
                 for (int i = 0; i < viewModel.Quantity; i++)
                 {
                     var userViewModel = viewModel.Users[i];
+
+                    // Check if the username is unique within the current request
+                    if (!usernamesInRequest.Add(userViewModel.Username))
+                    {
+                        ModelState.AddModelError("", $"Usernames need to be unique");
+                        return View("Create", viewModel);
+                    }
 
                     // Check if the username is unique within the company
                     var isUsernameUnique = !_context.Users.Any(u =>
@@ -121,7 +131,7 @@ namespace ProductManager.Controllers
 
                     if (!isUsernameUnique)
                     {
-                        ModelState.AddModelError("", $"Email already exists.");
+                        ModelState.AddModelError("", $"Username already exists.");
                         return View("Create", viewModel);
                     }
                     else

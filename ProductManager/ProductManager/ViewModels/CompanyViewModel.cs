@@ -9,7 +9,7 @@ namespace ProductManager.ViewModels
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Company phone number is required")]
-        [StringLength(15)]
+        [StringLength(10, ErrorMessage = "Phone number must be at least 10 characters in length.", MinimumLength = 10)]
         public string PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Company Email is required")]
