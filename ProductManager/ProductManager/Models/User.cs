@@ -19,5 +19,7 @@ namespace ProductManager.Models
 
         public int CompanyId { get; set; }
         public Company Company { get; set; }
+
+        public ICollection<UserRole> UserRoles { get; set; }
     }
 }
