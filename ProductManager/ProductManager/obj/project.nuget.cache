@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "REaDgDagfeXdk15Z2Z98z9dp3YRsU9vZMhW/3F3b/TJZ0HSxgJqTC5sUkDr7ICApC1yoBfUnyNz+j7JfN2gorA==",
+  "dgSpecHash": "I/G7jOMCvYIIp/huJnLqfmw8UMf/tmW8rHedniX4nWLxG1HGLEZNcZ/NptWgNfjjYSRnywbw/VLelCDyMOx+RA==",
   "success": true,
   "projectFilePath": "C:\\Users\\tchit\\OneDrive\\probable-carnival\\ProductManager\\ProductManager\\ProductManager.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\tchit\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\tchit\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
+    "C:\\Users\\tchit\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\tchit\\.nuget\\packages\\humanizer\\2.14.1\\humanizer.2.14.1.nupkg.sha512",
     "C:\\Users\\tchit\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\tchit\\.nuget\\packages\\humanizer.core.af\\2.14.1\\humanizer.core.af.2.14.1.nupkg.sha512",

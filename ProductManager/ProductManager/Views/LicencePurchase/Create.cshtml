@@ -1,0 +1,40 @@
+﻿@using ProductManager.ViewModels;
+@model UserViewModel
+@{
+}
+
+<h2>User Registration</h2>
+
+<form asp-controller="LicencePurchase" asp-action="CreatePost" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Quantity" />
+    <input type="hidden" asp-for="CompanyId" />
+
+    @{
+        // Loop to generate user input elements based on quantity
+        for (int licenceNumber = 0; licenceNumber < Model.Quantity; licenceNumber++)
+        {
+            <div style="display: inline-block; width: 500px;">
+                <label asp-for="Users[licenceNumber].Username">UserName</label>
+                <input asp-for="Users[licenceNumber].Username" class="form-control" />
+                <span asp-validation-for="Users[licenceNumber].Username" class="text-danger"></span>
+            </div>
+
+            <div style="display: inline-block; width: 500px;">
+                <label asp-for="Users[licenceNumber].Password">Password</label>
+                <div class="input-group">
+                    <input asp-for="Users[licenceNumber].Password" class="form-control" />
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-dark" onclick="togglePassword(this)">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <span asp-validation-for="Users[licenceNumber].Password" class="text-danger"></span>
+                <span id="passwordStrengthMessage" class="text-success"></span>
+            </div>
+        }
+    }
+    <br />
+    <button type="submit">Purchase Licence</button>
+</form>

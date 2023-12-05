@@ -12,7 +12,7 @@ namespace ProductManager.Models
         public string CompanyName { get; set; }
 
         [Required(ErrorMessage = "Company Phone Number is required")]
-        [StringLength(15)]
+        [StringLength(10, ErrorMessage = "Phone number must be at least 10 characters in length.", MinimumLength = 10)]
         public string CompanyPhoneNumber { get; set;} = string.Empty;
 
         [Required(ErrorMessage = "Company Email is required")]
@@ -20,5 +20,6 @@ namespace ProductManager.Models
         public string CompanyEmail { get; set; } = string.Empty;
 
         public ICollection<LicencePurchase> LicencePurchases { get; set; }
+        public ICollection<User> Users { get; set; }
     }
 }

@@ -332,3 +332,4 @@ C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager.Tests\ob
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager.Tests\obj\Debug\net6.0\ProductManager.Tests.pdb
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager.Tests\obj\Debug\net6.0\ProductManager.Tests.genruntimeconfig.cache
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager.Tests\obj\Debug\net6.0\ref\ProductManager.Tests.dll
+C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager.Tests\bin\Debug\net6.0\BCrypt.Net-Next.dll

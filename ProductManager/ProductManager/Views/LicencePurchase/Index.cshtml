@@ -1,0 +1,101 @@
+﻿@using ProductManager.ViewModels;
+@model LicencePurchaseViewModel
+@{
+}
+
+<h1>Purchase a Licence</h1>
+
+<form asp-controller="LicencePurchase" asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="CompanyDetails.Name">Company Name</label>
+        <input asp-for="CompanyDetails.Name" class="form-control" />
+        <span asp-validation-for="CompanyDetails.Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CompanyDetails.PhoneNumber">Phone</label>
+        <input asp-for="CompanyDetails.PhoneNumber" class="form-control" />
+        <span asp-validation-for="CompanyDetails.PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CompanyDetails.Email">Email</label>
+        <input asp-for="CompanyDetails.Email" class="form-control" />
+        <span asp-validation-for="CompanyDetails.Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LicenceName">Licence</label>
+        <input asp-for="LicenceName" class="form-control" readonly/>
+        <span asp-validation-for="LicenceName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Quantity">Quantity</label>
+        <div class="input-group">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" id="decrementQuantity">-</button>
+            </span>
+            <input asp-for="Quantity" class="form-control text-center" type="number" id="Quantity" min="1" step="1" />
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" id="incrementQuantity">+</button>
+            </span>
+        </div>
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PurchaseDate">Date</label>
+        <input asp-for="PurchaseDate" class="form-control" readonly/>
+        <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TotalCost">Total Cost</label>
+        <input asp-for="TotalCost" class="form-control" id="TotalCost" readonly />
+        <span asp-validation-for="TotalCost" class="text-danger"></span>
+    </div>
+
+    <button type="submit">Purchase Licence</button>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        updateTotalCost();
+    });
+
+    var quantityInput = document.getElementById("Quantity");
+    var totalCostInput = document.getElementById("TotalCost");
+    var decrementButton = document.getElementById("decrementQuantity");
+    var incrementButton = document.getElementById("incrementQuantity");
+
+    decrementButton.addEventListener("click", function () {
+        // Decrement the quantity when the "-" button is clicked
+        if (quantityInput.value > 1) {
+            quantityInput.value = parseInt(quantityInput.value) - 1;
+            updateTotalCost();
+        }
+    });
+
+    incrementButton.addEventListener("click", function () {
+        // Increment the quantity when the "+" button is clicked
+        quantityInput.value = parseInt(quantityInput.value) + 1;
+        updateTotalCost();
+    });
+
+    function updateTotalCost(){
+        var quantity = parseInt(quantityInput.value);
+        var cost = @Html.Raw(Json.Serialize(Model.LicenceCost));
+
+        if (!isNaN(quantity)) {
+            var totalCost = parseFloat(quantity) * parseFloat(cost);
+            totalCost = totalCost.toFixed(2);
+            var formattedValue = totalCost.toString().replace('.', ',');
+            totalCostInput.value = formattedValue;
+        } else {
+            totalCostInput.value = "";
+        }
+    }
+</script>
