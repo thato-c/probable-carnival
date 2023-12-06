@@ -185,7 +185,7 @@ namespace ProductManager.Controllers
                 // Save the roles to the database
                 _context.SaveChanges();
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Login");
             } 
             else
             {
