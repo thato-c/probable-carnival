@@ -1,7 +1,10 @@
-﻿namespace ProductManager.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProductManager.Models
 {
     public class UserProjectAssignment
     {
+        [Key]
         public int AssignmentId { get; set; }
 
         public int ProjectId { get; set; }
