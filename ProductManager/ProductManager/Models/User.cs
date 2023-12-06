@@ -22,6 +22,6 @@ namespace ProductManager.Models
 
         public ICollection<UserRole> UserRoles { get; set; }
 
-        public ICollection<UserProjectAssignment> ProjectAssignments { get; set; }
+        public ICollection<UserProjectAssignment> UserProjectAssignments { get; set; }
     }
 }

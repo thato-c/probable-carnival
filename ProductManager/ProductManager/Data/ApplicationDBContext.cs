@@ -18,6 +18,10 @@ namespace ProductManager.Data
 
         public DbSet<UserRole> UserRoles { get; set; }
 
+        public DbSet<Project> Projects { get; set; }
+
+        public DbSet<UserProjectAssignment> UserProjectsAssignments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Company>().ToTable("Company");
@@ -57,7 +61,24 @@ namespace ProductManager.Data
                 .WithOne(userRole => userRole.Role)
                 .HasForeignKey(userRole => userRole.RoleId);
 
-            
+            // Configure the relationship between Company and Project
+            modelBuilder.Entity<Company>()
+                .HasMany (company => company.Projects)
+                .WithOne(project => project.Company)
+                .HasForeignKey (project => project.CompanyId);
+
+            // Configure the relationship between Project and UserProjectAssignment
+            modelBuilder.Entity<Project>()
+                .HasMany(project => project.UserProjectAssignments)
+                .WithOne(userProjectAssignment => userProjectAssignment.Project)
+                .HasForeignKey(userProjectAssignment => userProjectAssignment.ProjectId);
+
+
+            // Configure the relationship between User and UserProjectAssignment
+            modelBuilder.Entity<User>()
+                .HasMany(user => user.UserProjectAssignments)
+                .WithOne(userProjectAssignment => userProjectAssignment.User)
+                .HasForeignKey(userProjectAssignment => userProjectAssignment.UserId);    
         }
     }
 }

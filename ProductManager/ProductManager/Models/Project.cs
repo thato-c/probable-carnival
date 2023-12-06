@@ -9,5 +9,7 @@
         public int CompanyId { get; set; }
 
         public Company Company { get; set; }
+
+        public ICollection<UserProjectAssignment> UserProjectAssignments { get; set; }
     }
 }
