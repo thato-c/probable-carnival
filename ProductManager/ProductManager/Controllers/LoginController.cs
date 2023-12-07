@@ -61,8 +61,7 @@ namespace ProductManager.Controllers
                             }
                             else
                             {
-                                // Redirect to Create a project
-                                return RedirectToAction("Create", "Project");
+                                return RedirectToAction("Create", "Project", new {companyId = user.CompanyId});
                             }
                         }
                         else if(userRole == null)

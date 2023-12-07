@@ -4,4 +4,35 @@
 @{
 }
 
-<h1>List of Projects for your company</h1>
+<h1>Company Projects</h1>
+
+<br />
+    <a asp-controller="Project" asp-action="Create">Add a new Project</a>
+<br />
+<br />
+
+@if (Model != null)
+{
+    <table class="table">
+        <tr>>
+            <th>
+                Name
+            </th>
+        </tr>
+        @foreach (var project in Model)
+        {
+            if (project != null)
+            {
+                <tr>
+                    <td>
+                        @project.Name
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+}
+else
+{
+    <p>@ViewBag.Message</p>
+}

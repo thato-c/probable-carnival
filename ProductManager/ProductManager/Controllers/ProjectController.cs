@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
+using ProductManager.ViewModels;
 
 namespace ProductManager.Controllers
 {
@@ -12,6 +13,7 @@ namespace ProductManager.Controllers
         { 
             _context = context;
         }
+
         public async Task<IActionResult> Index(int companyId)
         {
             var projects = await _context.Projects.Where(p => p.CompanyId == companyId).ToListAsync();
@@ -27,9 +29,40 @@ namespace ProductManager.Controllers
             }   
         }
 
-        public IActionResult Create()
+        [HttpGet]
+        public IActionResult Create(int companyId)
         {
-            return View();
+            var ProjectViewModel = new ProjectViewModel
+            {
+                CompanyId = companyId,
+            };
+
+            return View(ProjectViewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateProject(ProjectViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Map the ViewModel to Project Entity
+                var project = new Models.Project
+                {
+                    Name = model.Name,
+                    CompanyId = model.CompanyId,
+                };
+
+                // Add and save the new project to the database
+                _context.Projects.Add(project);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Index", new {companyId = model.CompanyId});
+            }
+            else
+            {
+                return View("Create", model);
+            }
         }
     }
 }
