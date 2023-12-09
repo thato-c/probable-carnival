@@ -4,9 +4,11 @@ using BCrypt.Net;
 using ProductManager.Data;
 using ProductManager.Models;
 using ProductManager.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProductManager.Controllers
 {
+    [AllowAnonymous]
     public class LicencePurchaseController : Controller
     {
         private readonly ApplicationDBContext _context;
