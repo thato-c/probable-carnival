@@ -1,13 +1,8 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
+﻿
 <h1>Company Projects</h1>
 
 <br />
-    <a asp-controller="Project" asp-action="Create">Add a new Project</a>
+    <a asp-controller="Project" asp-action="Create" asp-route-companyId="@ViewBag.CompanyId">Add a new Project</a>
 <br />
 <br />
 

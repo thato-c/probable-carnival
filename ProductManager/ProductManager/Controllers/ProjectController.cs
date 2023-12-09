@@ -14,8 +14,10 @@ namespace ProductManager.Controllers
             _context = context;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index(int companyId)
         {
+            ViewBag.CompanyId = companyId;
             var projects = await _context.Projects.Where(p => p.CompanyId == companyId).ToListAsync();
 
             if (projects != null && projects.Any())
