@@ -1,0 +1,69 @@
+﻿
+<h1>Company Projects</h1>
+
+<br />
+<a asp-controller="Project" asp-action="Create" asp-route-companyId="@ViewBag.CompanyId">Add a new Project</a>
+<br />
+<br />
+
+@if (Model != null)
+{
+    <table class="table">
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                <input type="checkbox" class="selectAll" />
+            </th>
+        </tr>
+        @foreach (var user in Model)
+        {
+            if (user != null)
+            {
+                <tr>
+                    <td>
+                        @user.Username
+                    </td>
+                    <td>
+                        <input type="checkbox" class="userCheckBox" data-username="@user.Username" />
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+}
+else
+{
+    <p>@ViewBag.Message</p>
+}
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function (){
+        var checkedUsernames = [];
+
+        // Select/Deselect all checkboxes
+        $(".selectAll").change(function () {
+            $(".userCheckBox").prop('checked', $(this).prop("checked"));
+            updateCheckedUsernames();
+        });
+
+        // Handle individual checkbox changes
+        $(".userCheckBox").change(function (){
+            updateCheckedUsernames();
+        });
+
+        function updateCheckedUsernames(){
+            checkedUsernames = [];
+
+            // Get usernames off checked checkboxes
+            $(".userCheckBox:checked").each(function (){
+                checkedUsernames.push($(this).data("username"));
+            });
+
+            // Output the list to console
+            console.log(checkedUsernames);
+        }
+    })
+</script>

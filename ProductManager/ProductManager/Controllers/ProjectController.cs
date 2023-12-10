@@ -59,11 +59,26 @@ namespace ProductManager.Controllers
                 _context.Projects.Add(project);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Index", new {companyId = model.CompanyId});
+                return RedirectToAction("UserAssignment", new {companyId = model.CompanyId});
             }
             else
             {
                 return View("Create", model);
+            }
+        }
+
+        public async Task<IActionResult> UserAssignment(int companyId)
+        {
+            var users = await _context.Users.Where(u => u.CompanyId == companyId).ToListAsync();
+
+            if (users != null && users .Any()) 
+            {
+                return View(users);
+            }
+            else
+            {
+                ViewBag.Message = "There are no users in your company.";
+                return View();
             }
         }
     }
