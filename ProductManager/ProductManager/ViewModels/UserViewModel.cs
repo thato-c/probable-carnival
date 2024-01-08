@@ -14,7 +14,5 @@ namespace ProductManager.ViewModels
 
         // User properties
         public List<UserRegistrationViewModel> Users { get; set; }
-         
-
     }
 }

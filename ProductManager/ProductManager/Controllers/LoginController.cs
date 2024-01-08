@@ -43,7 +43,6 @@ namespace ProductManager.Controllers
 
                     var userRole = await _context.UserRoles.FirstOrDefaultAsync(u => u.UserId == user.UserId);
 
-
                     if (user.UserProjectAssignments != null && user.UserProjectAssignments.Any())
                     {
                         // User has projects assigned, redirect to a page related to their project.
@@ -88,6 +87,7 @@ namespace ProductManager.Controllers
 
                             return View("ContactAdmin");
                         }
+                        
                         // User  has a role of Company Admin
                         else if (userRole != null && userRole.Role != null && userRole.Role.Name == "Company Administrator")
                         {

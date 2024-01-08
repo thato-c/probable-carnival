@@ -5,8 +5,10 @@
 @if (Model != null)
 {
     <form asp-controller="Project" asp-action="UserAssignmentPost" method="post">
+        @Html.AntiForgeryToken()
 
-        <input type="hidden" asp-for="ProjectId" value="@ViewBag.ProjectId"/>
+        <input type="hidden" asp-for="ProjectId" value="@Model.ProjectId"/>
+        <input type="hidden" asp-for="CompanyId" value="@Model.CompanyId"/>
         
         <button type="submit">Assign Users</button>
 
@@ -38,7 +40,6 @@
         </table>
         <input type="hidden" asp-for="CheckedUsernames" />
         <span asp-validation-for="CheckedUsernames" class="text-danger"></span>
-        
     </form>
 }
 else

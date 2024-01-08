@@ -94,6 +94,7 @@ namespace ProductManager.Controllers
                 var ProjectUserAssignmentViewModel = new ProjectUserAssignmentViewModel
                 {
                     ProjectId = viewModel.ProjectId,
+                    CompanyId = viewModel.CompanyId,
                     ProjectUsers = users,
                 };
 
@@ -114,7 +115,6 @@ namespace ProductManager.Controllers
         {
             try
             {
-                
                 if (ModelState.IsValid)
                 {
                     Console.WriteLine("Model State is Valid");
@@ -141,14 +141,16 @@ namespace ProductManager.Controllers
                         _context.UserProjectsAssignments.Add(Assignment);
                     }
 
+                    int CompanyId = viewModel.CompanyId;
+
                     await _context.SaveChangesAsync();
-                    return View("Index");
+                    return RedirectToAction("Index", new {companyId = CompanyId});
                 }
                 else
                 {
                     return View("UserAssignment", viewModel);
                 }
-            }
+            }   
             catch (DbUpdateException ex)
             {
                 // Log the exception details

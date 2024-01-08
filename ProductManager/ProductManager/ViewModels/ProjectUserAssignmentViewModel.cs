@@ -6,6 +6,8 @@ namespace ProductManager.ViewModels
     {
         public int ProjectId { get; set; }
 
+        public int CompanyId { get; set; }
+
         public List<ProjectUserViewModel> ProjectUsers { get; set; }
 
         [Required(ErrorMessage = "No users have been selected.")]
