@@ -1,37 +1,45 @@
-﻿
-<h1>Company Projects</h1>
+﻿@model ProductManager.ViewModels.ProjectUserAssignmentViewModel
 
-<br />
-<a asp-controller="Project" asp-action="Create" asp-route-companyId="@ViewBag.CompanyId">Add a new Project</a>
-<br />
-<br />
+<h1>Assign Users</h1>
 
 @if (Model != null)
 {
-    <table class="table">
-        <tr>
-            <th>
-                Name
-            </th>
-            <th>
-                <input type="checkbox" class="selectAll" />
-            </th>
-        </tr>
-        @foreach (var user in Model)
-        {
-            if (user != null)
+    <form asp-controller="Project" asp-action="UserAssignmentPost" method="post">
+
+        <input type="hidden" asp-for="ProjectId" value="@ViewBag.ProjectId"/>
+        
+        <button type="submit">Assign Users</button>
+
+        <table class="table">
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    <input type="checkbox" class="selectAll" />
+                </th>
+            </tr>
+            @for (var i = 0; i < Model.ProjectUsers.Count; i++)
             {
-                <tr>
-                    <td>
-                        @user.Username
-                    </td>
-                    <td>
-                        <input type="checkbox" class="userCheckBox" data-username="@user.Username" />
-                    </td>
-                </tr>
+                var user = Model.ProjectUsers[i];
+                if (user != null)
+                {
+                    <tr>
+                        <td>
+                            @user.Username
+                        </td>
+                        <td>
+                            <input type="checkbox" class="userCheckBox" data-username="@user.Username" asp-for="ProjectUsers[i].IsSelected"/>
+                            <input type="hidden" asp-for="ProjectUsers[i].Username" value="@user.Username"/>
+                        </td>
+                    </tr>
+                }
             }
-        }
-    </table>
+        </table>
+        <input type="hidden" asp-for="CheckedUsernames" />
+        <span asp-validation-for="CheckedUsernames" class="text-danger"></span>
+        
+    </form>
 }
 else
 {
@@ -40,7 +48,7 @@ else
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
-    $(document).ready(function (){
+    $(document).ready(function () {
         var checkedUsernames = [];
 
         // Select/Deselect all checkboxes
@@ -50,17 +58,20 @@ else
         });
 
         // Handle individual checkbox changes
-        $(".userCheckBox").change(function (){
+        $(".userCheckBox").change(function () {
             updateCheckedUsernames();
         });
 
-        function updateCheckedUsernames(){
+        function updateCheckedUsernames() {
             checkedUsernames = [];
 
             // Get usernames off checked checkboxes
-            $(".userCheckBox:checked").each(function (){
+            $(".userCheckBox:checked").each(function () {
                 checkedUsernames.push($(this).data("username"));
             });
+
+            // Update the value of the hidden input field
+            $("#CheckedUsernames").val(checkedUsernames.join(','));
 
             // Output the list to console
             console.log(checkedUsernames);
