@@ -117,8 +117,6 @@ namespace ProductManager.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    Console.WriteLine("Model State is Valid");
-
                     var selectedUsernames = viewModel.ProjectUsers
                         .Where(u => u.IsSelected)
                         .Select(u => u.Username)
@@ -165,43 +163,5 @@ namespace ProductManager.Controllers
                 return View("UserAssignment", viewModel);
             }
         }
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> AssignUser(string checkedUsernames)
-        //{
-        //    List<string> checkedUsernamesList = checkedUsernames.Split(',').ToList();
-
-        //    if (checkedUsernamesList != null && checkedUsernamesList.Any())
-        //    {
-        //        var companyId = await _context.Users
-        //                .Where(u => u.Username == checkedUsernamesList[0])
-        //                .Select(u => u.CompanyId)
-        //                .FirstOrDefaultAsync();
-
-        //        for (int i = 0; i < checkedUsernamesList.Count; i++)
-        //        {
-        //            var userId = await _context.Users
-        //                .Where(u => u.Username == checkedUsernamesList[i])
-        //                .Select(u => u.UserId)
-        //                .FirstOrDefaultAsync();
-
-        //            var Assignment = new UserProjectAssignment
-        //            {
-        //                UserId = userId,
-        //                ProjectId = ViewBag.ProjectId,
-        //            };
-        //            _context.Add(Assignment);
-        //        }
-
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction("Index", new { companyId });
-        //    }
-        //    else
-        //    {
-        //        TempData["UserAssignmentError"] = "No users have been selected.";
-        //        return RedirectToAction("UserAssignment");
-        //    }
-        //}
     }
 }
