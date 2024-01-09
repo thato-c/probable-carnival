@@ -1,0 +1,43 @@
+﻿@model ProductManager.ViewModels.ProjectUserAssignmentRoleViewModel
+
+<h1>Assign User Roles</h1>
+
+@if (Model != null)
+{
+    <form>
+        <input type="hidden" asp-for="ProjectId" value="@Model.ProjectId" />
+        <input type="hidden" asp-for="CompanyId" value="@Model.CompanyId" />
+
+        <table class="table">
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Select Role:
+                </th>
+            </tr>
+            @for (var i = 0; i < Model.ProjectUserRoles.Count; i++)
+            {
+                var user = Model.ProjectUserRoles[i];
+                if (user != null)
+                {
+                    <tr>
+                        <td>
+                            @user.Username
+                        </td>
+                        <td>
+                            <select asp-for="ProjectUserRoles[i].SelectedRole" asp-items=ViewBag.Roles> </select>
+                        </td>
+                    </tr>
+                    <input type="hidden" asp-for="@user.AssignmentId">
+                }
+            }
+        </table>
+
+    </form>
+}
+else
+{
+    <p>@ViewBag.Message</p>
+}

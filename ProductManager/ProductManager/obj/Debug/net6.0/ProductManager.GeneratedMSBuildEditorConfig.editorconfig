@@ -47,12 +47,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Project/AssignRole.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvamVjdFxBc3NpZ25Sb2xlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Project/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvamVjdFxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Project/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvamVjdFxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Project/ProjectRole.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvamVjdFxQcm9qZWN0Um9sZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Project/UserAssignment.cshtml]

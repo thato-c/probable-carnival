@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
 using ProductManager.Models;
@@ -142,7 +143,33 @@ namespace ProductManager.Controllers
                     int CompanyId = viewModel.CompanyId;
 
                     await _context.SaveChangesAsync();
-                    return RedirectToAction("Index", new {companyId = CompanyId});
+
+                    ViewBag.Roles = new SelectList(new List<SelectListItem>
+                    {
+                        new SelectListItem { Value = "Project Admin", Text = "Project Admin"},
+                        new SelectListItem { Value = "Read and Write", Text = "Read and Write"},
+                        new SelectListItem { Value = "Read Only", Text = "Read Only"}
+                    }, "Value", "Text");
+
+                    var projectUserRoles = await (
+                        from userProjectAssignment in _context.UserProjectsAssignments
+                        join project in _context.Users on userProjectAssignment.UserId equals project.UserId
+                        where userProjectAssignment.ProjectId == viewModel.ProjectId
+                        select new UserAssignmentRoleViewModel
+                        {
+                            Username = project.Username,
+                            SelectedRole = "Read Only", // Set to Read
+                            AssignmentId = userProjectAssignment.AssignmentId,
+                        }).ToListAsync();
+
+                    var projectUserAssignmentRoleViewModel = new ProjectUserAssignmentRoleViewModel
+                    {
+                        ProjectId = viewModel.ProjectId,
+                        CompanyId = viewModel.CompanyId,
+                        ProjectUserRoles = projectUserRoles,
+                    };
+
+                    return View("ProjectRole", projectUserAssignmentRoleViewModel);
                 }
                 else
                 {
@@ -150,6 +177,62 @@ namespace ProductManager.Controllers
                 }
             }   
             catch (DbUpdateException ex)
+            {
+                // Log the exception details
+                Console.WriteLine($"DbUpdateException: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+
+                // Optionally, log additional details
+                // Log the SQL statement causing the exception
+                Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+
+                ModelState.AddModelError("", "An error occurred while saving data to the database.");
+                return View("UserAssignment", viewModel);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ProjectRole(ProjectUserAssignmentRoleViewModel viewModel)
+        {
+            try
+            {
+                ViewBag.Roles = new SelectList(new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "Project Admin", Text = "Project Admin"},
+                    new SelectListItem { Value = "Read and Write", Text = "Read and Write"},
+                    new SelectListItem { Value = "Read Only", Text = "Read Only"}
+                }, "Value", "Text");
+
+                var projectUserRoles = await (
+                    from userProjectAssignment in _context.UserProjectsAssignments
+                    join assignment in _context.UserProjectRoles on userProjectAssignment.AssignmentId equals assignment.AssignmentId
+                    join role in _context.Roles on assignment.RoleId equals role.RoleId
+                    join user in _context.Users on assignment.UserProjectAssignment.UserId equals user.UserId
+                    where userProjectAssignment.ProjectId == viewModel.ProjectId
+                    select new UserAssignmentRoleViewModel
+                    {
+                        SelectedRole = role.Name,
+                        Username = user.Username,
+                        AssignmentId = assignment.AssignmentId,
+                    }).ToListAsync();
+
+                // There are roles associated with ProjectUsers already
+                if (projectUserRoles != null &&  projectUserRoles.Any() )
+                {
+                    var projectUserAssignmentRoleViewModel = new ProjectUserAssignmentRoleViewModel
+                    {
+                        ProjectId = viewModel.ProjectId,
+                        CompanyId = viewModel.CompanyId,
+                        ProjectUserRoles = projectUserRoles,
+                    };
+
+                    return View(projectUserRoles.ToArray());
+                }
+                else
+                {
+                    return View();
+                }
+            } catch (DbUpdateException ex)
             {
                 // Log the exception details
                 Console.WriteLine($"DbUpdateException: {ex.Message}");
