@@ -14,5 +14,7 @@ namespace ProductManager.Models
         public string Description { get; set; }
 
         public ICollection<UserRole> UserRoles { get; set;}
+
+        public ICollection<UserProjectRole> UserProjectRoles { get; set; }
     }
 }

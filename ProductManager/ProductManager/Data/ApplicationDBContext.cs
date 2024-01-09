@@ -22,6 +22,8 @@ namespace ProductManager.Data
 
         public DbSet<UserProjectAssignment> UserProjectsAssignments { get; set; }
 
+        public DbSet<UserProjectRole> UserProjectRoles { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Company>().ToTable("Company");
@@ -30,6 +32,7 @@ namespace ProductManager.Data
             modelBuilder.Entity<User>().ToTable("User");
             modelBuilder.Entity<UserRole>().ToTable("UserRole");
             modelBuilder.Entity<Role>().ToTable("Role");
+            modelBuilder.Entity<UserProjectRole>().ToTable("UserProjectRole");
 
             // Configure the relationship between Licence and LicencePurchase
             modelBuilder.Entity<Licence>()
@@ -73,12 +76,23 @@ namespace ProductManager.Data
                 .WithOne(userProjectAssignment => userProjectAssignment.Project)
                 .HasForeignKey(userProjectAssignment => userProjectAssignment.ProjectId);
 
-
             // Configure the relationship between User and UserProjectAssignment
             modelBuilder.Entity<User>()
                 .HasMany(user => user.UserProjectAssignments)
                 .WithOne(userProjectAssignment => userProjectAssignment.User)
-                .HasForeignKey(userProjectAssignment => userProjectAssignment.UserId);    
+                .HasForeignKey(userProjectAssignment => userProjectAssignment.UserId);
+
+            // Configure the relationship between Role and UserProjectRole
+            modelBuilder.Entity<Role>()
+                .HasMany(role => role.UserProjectRoles)
+                .WithOne(userProjectRole => userProjectRole.Role)
+                .HasForeignKey(UserProjectRole => UserProjectRole.RoleId);
+
+            // Configure the relationship between UserProjectAssignment and UserProjectRole
+            modelBuilder.Entity<UserProjectAssignment>()
+                .HasMany(assignment => assignment.UserProjectRoles)
+                .WithOne(userProjectRole => userProjectRole.UserProjectAssignment)
+                .HasForeignKey(UserProjectRole => UserProjectRole.AssignmentId);
         }
     }
 }
