@@ -141,35 +141,15 @@ namespace ProductManager.Controllers
                     }
 
                     int CompanyId = viewModel.CompanyId;
-
                     await _context.SaveChangesAsync();
 
-                    ViewBag.Roles = new SelectList(new List<SelectListItem>
-                    {
-                        new SelectListItem { Value = "Project Admin", Text = "Project Admin"},
-                        new SelectListItem { Value = "Read and Write", Text = "Read and Write"},
-                        new SelectListItem { Value = "Read Only", Text = "Read Only"}
-                    }, "Value", "Text");
-
-                    var projectUserRoles = await (
-                        from userProjectAssignment in _context.UserProjectsAssignments
-                        join project in _context.Users on userProjectAssignment.UserId equals project.UserId
-                        where userProjectAssignment.ProjectId == viewModel.ProjectId
-                        select new UserAssignmentRoleViewModel
-                        {
-                            Username = project.Username,
-                            SelectedRole = "Read Only", // Set to Read
-                            AssignmentId = userProjectAssignment.AssignmentId,
-                        }).ToListAsync();
-
-                    var projectUserAssignmentRoleViewModel = new ProjectUserAssignmentRoleViewModel
+                    var ProjectUserAssignmentRoleViewModel = new ProjectUserAssignmentRoleViewModel
                     {
                         ProjectId = viewModel.ProjectId,
                         CompanyId = viewModel.CompanyId,
-                        ProjectUserRoles = projectUserRoles,
                     };
 
-                    return View("ProjectRole", projectUserAssignmentRoleViewModel);
+                    return RedirectToAction("ProjectRole", ProjectUserAssignmentRoleViewModel);
                 }
                 else
                 {
@@ -196,43 +176,42 @@ namespace ProductManager.Controllers
         {
             try
             {
-                ViewBag.Roles = new SelectList(new List<SelectListItem>
-                {
-                    new SelectListItem { Value = "Project Admin", Text = "Project Admin"},
-                    new SelectListItem { Value = "Read and Write", Text = "Read and Write"},
-                    new SelectListItem { Value = "Read Only", Text = "Read Only"}
-                }, "Value", "Text");
-
                 var projectUserRoles = await (
                     from userProjectAssignment in _context.UserProjectsAssignments
-                    join assignment in _context.UserProjectRoles on userProjectAssignment.AssignmentId equals assignment.AssignmentId
-                    join role in _context.Roles on assignment.RoleId equals role.RoleId
-                    join user in _context.Users on assignment.UserProjectAssignment.UserId equals user.UserId
+                    join project in _context.Users on userProjectAssignment.UserId equals project.UserId
                     where userProjectAssignment.ProjectId == viewModel.ProjectId
-                    select new UserAssignmentRoleViewModel
+                    select new AssignmentRoleViewModel
                     {
-                        SelectedRole = role.Name,
-                        Username = user.Username,
-                        AssignmentId = assignment.AssignmentId,
+                        Username = project.Username,
+                        SelectedRole = "Read Only", // Set to Read
+                        AssignmentId = userProjectAssignment.AssignmentId,
                     }).ToListAsync();
 
-                // There are roles associated with ProjectUsers already
-                if (projectUserRoles != null &&  projectUserRoles.Any() )
+                if (projectUserRoles != null && projectUserRoles.Any())
                 {
-                    var projectUserAssignmentRoleViewModel = new ProjectUserAssignmentRoleViewModel
+                    var UserAssignmentRoleViewModel = new UserAssignmentRoleViewModel
                     {
                         ProjectId = viewModel.ProjectId,
                         CompanyId = viewModel.CompanyId,
                         ProjectUserRoles = projectUserRoles,
                     };
 
-                    return View(projectUserRoles.ToArray());
+                    ViewBag.Roles = new SelectList(new List<SelectListItem>
+                    {
+                        new SelectListItem { Value = "Project Admin", Text = "Project Admin"},
+                        new SelectListItem { Value = "Read and Write", Text = "Read and Write"},
+                        new SelectListItem { Value = "Read Only", Text = "Read Only"}
+                    }, "Value", "Text");
+
+                    return View(UserAssignmentRoleViewModel);
                 }
                 else
                 {
-                    return View();
+                    Console.WriteLine("ProjectUserRoles are null");
+                    return View(viewModel);
                 }
-            } catch (DbUpdateException ex)
+            }
+            catch (DbUpdateException ex)
             {
                 // Log the exception details
                 Console.WriteLine($"DbUpdateException: {ex.Message}");
@@ -245,6 +224,47 @@ namespace ProductManager.Controllers
                 ModelState.AddModelError("", "An error occurred while saving data to the database.");
                 return View("UserAssignment", viewModel);
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignmentRolePost(UserAssignmentRoleViewModel viewModel)
+        {
+            try
+            {
+                foreach (var projectAssignmentRole in viewModel.ProjectUserRoles)
+                {
+                    var assignmentId = projectAssignmentRole.AssignmentId;
+                    var roleId = await _context.Roles
+                        .Where(r => r.Name == projectAssignmentRole.SelectedRole)
+                        .Select(r => r.RoleId)
+                        .FirstOrDefaultAsync();
+
+                    var assignedRole = new Models.UserProjectRole
+                    {
+                        AssignmentId = assignmentId,
+                        RoleId = roleId
+                    };
+                    _context.UserProjectRoles.Add(assignedRole);
+                }
+                await _context.SaveChangesAsync();
+
+                int CompanyId = viewModel.CompanyId;
+                return RedirectToAction("Index", new { companyId = CompanyId });
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the exception details
+                Console.WriteLine($"DbUpdateException: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+
+                // Optionally, log additional details
+                // Log the SQL statement causing the exception
+                Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+
+                ModelState.AddModelError("", "An error occurred while saving data to the database.");
+                return View("UserAssignment", viewModel);
+            }           
         }
     }
 }

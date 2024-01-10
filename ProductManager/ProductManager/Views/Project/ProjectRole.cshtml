@@ -1,12 +1,16 @@
-﻿@model ProductManager.ViewModels.ProjectUserAssignmentRoleViewModel
+﻿@using ProductManager.ViewModels
+@model UserAssignmentRoleViewModel
 
 <h1>Assign User Roles</h1>
 
 @if (Model != null)
 {
-    <form>
+    <form asp-controller="Project" asp-action="AssignmentRolePost" method="post">
+
         <input type="hidden" asp-for="ProjectId" value="@Model.ProjectId" />
         <input type="hidden" asp-for="CompanyId" value="@Model.CompanyId" />
+
+        <button type="submit">Assign Roles</button>
 
         <table class="table">
             <tr>
@@ -27,10 +31,12 @@
                             @user.Username
                         </td>
                         <td>
-                            <select asp-for="ProjectUserRoles[i].SelectedRole" asp-items=ViewBag.Roles> </select>
+                            <input type="hidden" asp-for="ProjectUserRoles[i].Username" value="@user.Username" />
+                            <select asp-for="ProjectUserRoles[i].SelectedRole" data-username="@user.Username" asp-items=ViewBag.Roles></select>
+                            <input type="hidden" asp-for="ProjectUserRoles[i].AssignmentId" value="@user.AssignmentId">
                         </td>
                     </tr>
-                    <input type="hidden" asp-for="@user.AssignmentId">
+                    
                 }
             }
         </table>
