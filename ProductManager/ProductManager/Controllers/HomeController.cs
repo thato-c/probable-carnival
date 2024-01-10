@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ProductManager.Data;
 using ProductManager.Models;
 using System.Diagnostics;
 
@@ -8,13 +10,23 @@ namespace ProductManager.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private readonly ApplicationDBContext _context;
+
+        public HomeController(ILogger<HomeController> logger, ApplicationDBContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int ProjectId)
         {
+            var projectName = await _context.Projects
+                .Where(p => p.ProjectId == ProjectId)
+                .Select(p => p.Name)
+                .FirstOrDefaultAsync();
+
+            ViewBag.ProjectName = projectName;
+
             return View();
         }
 

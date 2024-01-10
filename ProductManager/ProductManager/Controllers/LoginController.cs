@@ -64,7 +64,7 @@ namespace ProductManager.Controllers
                         };
 
                         //return RedirectToAction("ProjectDetails", "Projects", new { projectId });
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Index", "Home", new {ProjectId = projectId});
                     }
                     else
                     {
