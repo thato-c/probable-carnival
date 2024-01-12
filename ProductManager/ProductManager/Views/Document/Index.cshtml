@@ -1,0 +1,47 @@
+﻿<form>
+    <label>Document Name</label>
+    <input />
+    <input type="file" id="document" name="documentName" />
+    <input type="submit"/>
+</form>
+
+<br />
+
+@if (Model != null)
+{
+    <table class="table">
+        <tr>
+            <th>
+                Document Name
+            </th>
+            <th>
+                Size
+            </th>
+            <th>
+                UploadDate
+            </th>
+        </tr>
+        @foreach (var document in Model)
+        {
+            if (document != null)
+            {
+                <tr>
+                    <td>
+                        @document.Name
+                    </td>
+                    <td>
+                        @document.FileSize
+                    </td>
+                    <td>
+                        @document.UploadDate
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+}
+else
+{
+    <p>No documents found for the current project</p>
+}
+

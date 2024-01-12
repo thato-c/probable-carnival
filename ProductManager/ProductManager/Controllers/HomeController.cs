@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ProductManager.Data;
 using ProductManager.Models;
 using System.Diagnostics;
 

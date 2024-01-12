@@ -49,6 +49,38 @@ namespace ProductManager.Migrations
                     b.ToTable("Company", (string)null);
                 });
 
+            modelBuilder.Entity("ProductManager.Models.Document", b =>
+                {
+                    b.Property<int>("DocumentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DocumentId"));
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FileURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("DocumentId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Document", (string)null);
+                });
+
             modelBuilder.Entity("ProductManager.Models.Licence", b =>
                 {
                     b.Property<int>("LicenceId")
@@ -110,6 +142,28 @@ namespace ProductManager.Migrations
                     b.ToTable("LicencePurchase", (string)null);
                 });
 
+            modelBuilder.Entity("ProductManager.Models.Project", b =>
+                {
+                    b.Property<int>("ProjectId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProjectId"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ProjectId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Projects");
+                });
+
             modelBuilder.Entity("ProductManager.Models.Role", b =>
                 {
                     b.Property<int>("RoleId")
@@ -158,6 +212,52 @@ namespace ProductManager.Migrations
                     b.ToTable("User", (string)null);
                 });
 
+            modelBuilder.Entity("ProductManager.Models.UserProjectAssignment", b =>
+                {
+                    b.Property<int>("AssignmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AssignmentId"));
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AssignmentId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserProjectsAssignments");
+                });
+
+            modelBuilder.Entity("ProductManager.Models.UserProjectRole", b =>
+                {
+                    b.Property<int>("ProjectRoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProjectRoleId"));
+
+                    b.Property<int>("AssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProjectRoleId");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("UserProjectRole", (string)null);
+                });
+
             modelBuilder.Entity("ProductManager.Models.UserRole", b =>
                 {
                     b.Property<int>("UserRoleId")
@@ -182,6 +282,17 @@ namespace ProductManager.Migrations
                     b.ToTable("UserRole", (string)null);
                 });
 
+            modelBuilder.Entity("ProductManager.Models.Document", b =>
+                {
+                    b.HasOne("ProductManager.Models.Project", "Project")
+                        .WithMany("Documents")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("ProductManager.Models.LicencePurchase", b =>
                 {
                     b.HasOne("ProductManager.Models.Company", "Company")
@@ -201,6 +312,17 @@ namespace ProductManager.Migrations
                     b.Navigation("Licence");
                 });
 
+            modelBuilder.Entity("ProductManager.Models.Project", b =>
+                {
+                    b.HasOne("ProductManager.Models.Company", "Company")
+                        .WithMany("Projects")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
             modelBuilder.Entity("ProductManager.Models.User", b =>
                 {
                     b.HasOne("ProductManager.Models.Company", "Company")
@@ -210,6 +332,44 @@ namespace ProductManager.Migrations
                         .IsRequired();
 
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("ProductManager.Models.UserProjectAssignment", b =>
+                {
+                    b.HasOne("ProductManager.Models.Project", "Project")
+                        .WithMany("UserProjectAssignments")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProductManager.Models.User", "User")
+                        .WithMany("UserProjectAssignments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ProductManager.Models.UserProjectRole", b =>
+                {
+                    b.HasOne("ProductManager.Models.UserProjectAssignment", "UserProjectAssignment")
+                        .WithMany("UserProjectRoles")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProductManager.Models.Role", "Role")
+                        .WithMany("UserProjectRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("UserProjectAssignment");
                 });
 
             modelBuilder.Entity("ProductManager.Models.UserRole", b =>
@@ -235,6 +395,8 @@ namespace ProductManager.Migrations
                 {
                     b.Navigation("LicencePurchases");
 
+                    b.Navigation("Projects");
+
                     b.Navigation("Users");
                 });
 
@@ -243,14 +405,30 @@ namespace ProductManager.Migrations
                     b.Navigation("LicencePurchases");
                 });
 
+            modelBuilder.Entity("ProductManager.Models.Project", b =>
+                {
+                    b.Navigation("Documents");
+
+                    b.Navigation("UserProjectAssignments");
+                });
+
             modelBuilder.Entity("ProductManager.Models.Role", b =>
                 {
+                    b.Navigation("UserProjectRoles");
+
                     b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("ProductManager.Models.User", b =>
                 {
+                    b.Navigation("UserProjectAssignments");
+
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("ProductManager.Models.UserProjectAssignment", b =>
+                {
+                    b.Navigation("UserProjectRoles");
                 });
 #pragma warning restore 612, 618
         }

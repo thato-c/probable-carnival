@@ -1,0 +1,33 @@
+﻿
+<h1>Company Projects</h1>
+
+<br />
+    <a asp-controller="Project" asp-action="Create" asp-route-companyId="@ViewBag.CompanyId">Add a new Project</a>
+<br />
+<br />
+
+@if (Model != null)
+{
+    <table class="table">
+        <tr>
+            <th>
+                Name
+            </th>
+        </tr>
+        @foreach (var project in Model)
+        {
+            if (project != null)
+            {
+                <tr>
+                    <td>
+                        @project.Name
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+}
+else
+{
+    <p>@ViewBag.Message</p>
+}

@@ -21,5 +21,7 @@ namespace ProductManager.Models
 
         public ICollection<LicencePurchase> LicencePurchases { get; set; }
         public ICollection<User> Users { get; set; }
+
+        public ICollection<Project> Projects { get; set; }
     }
 }
