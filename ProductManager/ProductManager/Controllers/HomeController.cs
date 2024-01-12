@@ -10,23 +10,13 @@ namespace ProductManager.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        private readonly ApplicationDBContext _context;
-
-        public HomeController(ILogger<HomeController> logger, ApplicationDBContext context)
+        public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-            _context = context;
         }
 
-        public async Task<IActionResult> Index(int ProjectId)
+        public IActionResult Index()
         {
-            var projectName = await _context.Projects
-                .Where(p => p.ProjectId == ProjectId)
-                .Select(p => p.Name)
-                .FirstOrDefaultAsync();
-
-            ViewBag.ProjectName = projectName;
-
             return View();
         }
 

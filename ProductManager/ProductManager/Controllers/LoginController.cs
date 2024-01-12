@@ -26,6 +26,7 @@ namespace ProductManager.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -46,12 +47,19 @@ namespace ProductManager.Controllers
                     if (user.UserProjectAssignments != null && user.UserProjectAssignments.Any())
                     {
                         // User has projects assigned, redirect to a page related to their project.
-                        var projectId = user.UserProjectAssignments.First().ProjectId;
+                        var projectName = await (
+                            from project in _context.Projects
+                            join assignment in _context.UserProjectsAssignments on project.ProjectId equals assignment.ProjectId
+                            where assignment.UserId == user.UserId
+                            select project.Name
+                        ).FirstOrDefaultAsync();
 
                         if (userRole != null && userRole.Role.Name != null)
                         {
+                            var username = user.Username;
                             claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
-                            claims.Add(new Claim("ProjectId", projectId.ToString()));
+                            claims.Add(new Claim(ClaimTypes.Name, username.ToString()));
+                            claims.Add(new Claim("ProjectName", projectName.ToString()));
                             
                             // Create a ClaimsIdentity and attach the claims to it.
                             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -63,8 +71,10 @@ namespace ProductManager.Controllers
                             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
                         };
 
+                        var projectId = user.UserProjectAssignments.First().ProjectId;
+
                         //return RedirectToAction("ProjectDetails", "Projects", new { projectId });
-                        return RedirectToAction("Index", "Home", new {ProjectId = projectId});
+                        return RedirectToAction("Index", "Home");
                     }
                     else
                     {
@@ -96,6 +106,7 @@ namespace ProductManager.Controllers
                             if (companyHasProjects)
                             {
                                 claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
+                                claims.Add(new Claim(ClaimTypes.Name, user.ToString()));
 
                                 // Create a ClaimsIdentity and attach the claims to it.
                                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -110,6 +121,7 @@ namespace ProductManager.Controllers
                             else
                             {
                                 claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
+                                claims.Add(new Claim(ClaimTypes.Name, user.ToString()));
 
                                 // Create a ClaimsIdentity and attach the claims to it.
                                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -131,6 +143,14 @@ namespace ProductManager.Controllers
                 }
             }
             return View("Index", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult ContactAdmin()

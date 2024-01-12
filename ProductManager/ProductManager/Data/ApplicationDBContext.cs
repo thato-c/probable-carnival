@@ -24,6 +24,8 @@ namespace ProductManager.Data
 
         public DbSet<UserProjectRole> UserProjectRoles { get; set; }
 
+        public DbSet<Document> Documents { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Company>().ToTable("Company");
@@ -33,6 +35,7 @@ namespace ProductManager.Data
             modelBuilder.Entity<UserRole>().ToTable("UserRole");
             modelBuilder.Entity<Role>().ToTable("Role");
             modelBuilder.Entity<UserProjectRole>().ToTable("UserProjectRole");
+            modelBuilder.Entity<Document>().ToTable("Document");
 
             // Configure the relationship between Licence and LicencePurchase
             modelBuilder.Entity<Licence>()
@@ -93,6 +96,12 @@ namespace ProductManager.Data
                 .HasMany(assignment => assignment.UserProjectRoles)
                 .WithOne(userProjectRole => userProjectRole.UserProjectAssignment)
                 .HasForeignKey(UserProjectRole => UserProjectRole.AssignmentId);
+
+            // Configure the relationship between Project and Document
+            modelBuilder.Entity<Project>()
+                .HasMany(project => project.Documents)
+                .WithOne(document => document.Project)
+                .HasForeignKey(doccument => doccument.ProjectId);
         }
     }
 }

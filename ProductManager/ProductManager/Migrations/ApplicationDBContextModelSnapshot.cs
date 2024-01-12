@@ -49,6 +49,38 @@ namespace ProductManager.Migrations
                     b.ToTable("Company", (string)null);
                 });
 
+            modelBuilder.Entity("ProductManager.Models.Document", b =>
+                {
+                    b.Property<int>("DocumentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DocumentId"));
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FileURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("DocumentId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Document", (string)null);
+                });
+
             modelBuilder.Entity("ProductManager.Models.Licence", b =>
                 {
                     b.Property<int>("LicenceId")
@@ -250,6 +282,17 @@ namespace ProductManager.Migrations
                     b.ToTable("UserRole", (string)null);
                 });
 
+            modelBuilder.Entity("ProductManager.Models.Document", b =>
+                {
+                    b.HasOne("ProductManager.Models.Project", "Project")
+                        .WithMany("Documents")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("ProductManager.Models.LicencePurchase", b =>
                 {
                     b.HasOne("ProductManager.Models.Company", "Company")
@@ -364,6 +407,8 @@ namespace ProductManager.Migrations
 
             modelBuilder.Entity("ProductManager.Models.Project", b =>
                 {
+                    b.Navigation("Documents");
+
                     b.Navigation("UserProjectAssignments");
                 });
 

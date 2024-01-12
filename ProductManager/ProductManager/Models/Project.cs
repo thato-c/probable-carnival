@@ -11,5 +11,7 @@
         public Company Company { get; set; }
 
         public ICollection<UserProjectAssignment> UserProjectAssignments { get; set; }
+
+        public ICollection<Document> Documents { get; set; }
     }
 }
