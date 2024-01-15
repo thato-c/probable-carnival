@@ -18,25 +18,34 @@ namespace ProductManager.Controllers
             // Get project Name
             string currentUserProjectName = GetCurrentUserProjectName();
 
-            // Get projectId
-            var projectId = await _context.Projects
-                .Where(p => p.Name == currentUserProjectName)
-                .Select(p => p.ProjectId)
-                .FirstOrDefaultAsync();
+            try
+            {
+                // Get projectId
+                var projectId = await _context.Projects
+                    .Where(p => p.Name == currentUserProjectName)
+                    .Select(p => p.ProjectId)
+                    .FirstOrDefaultAsync();
 
-            // Get project documents
-            var filteredDocuments = _context.Documents
-                .Where(d => d.ProjectId == projectId)
-                .ToListAsync();
+                // Get project documents
+                var filteredDocuments = _context.Documents
+                    .Where(d => d.ProjectId == projectId)
+                    .ToListAsync();
 
-            //var filteredDocuments = await (
-            //    from project in _context.Projects
-            //    join document in _context.Documents on project.ProjectId equals document.ProjectId
-            //    where document.Name == currentUserProjectName
-            //    select document.Name
-            //).ToListAsync();
+                return View(await filteredDocuments);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the exception details
+                Console.WriteLine($"DbUpdateException: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
 
-            return View(await filteredDocuments);
+                // Optionally, log additional details
+                // Log the SQL statement causing the exception
+                Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+                ModelState.AddModelError("", "An error occurred while retrieving data from the database.");
+                return View();
+            }
+            
         }
 
         public string GetCurrentUserProjectName()

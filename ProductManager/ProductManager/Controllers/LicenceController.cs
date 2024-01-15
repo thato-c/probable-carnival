@@ -23,16 +23,35 @@ namespace ProductManager.Controllers
         // GET: Licences
         public async Task<IActionResult> Index()
         {
-            // Retrieve a list of licences from the database
-            var licences = await _context.Licences.ToListAsync();
-
-            if (licences.Count == 0)
+            try
             {
-                ViewBag.Message = "No Licences Registered";
+                // Retrieve a list of licences from the database
+                var licences = await _context.Licences.ToListAsync();
+
+                if (licences.Count == 0)
+                {
+                    ViewBag.Message = "No Licences Registered";
+                    return View();
+                }
+                else
+                {
+                    return View(licences);
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the exception details
+                Console.WriteLine($"DbUpdateException: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+
+                // Optionally, log additional details
+                // Log the SQL statement causing the exception
+                Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+                ModelState.AddModelError("", "An error occurred while retrieving data from the database.");
+
+                ViewBag.Message = "An error occurred while retrieving data from the database.";
                 return View();
             }
-
-            return View(licences);
         }
 
         [HttpGet]
@@ -45,25 +64,40 @@ namespace ProductManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LicenceViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // Map the ViewModel to Licence entity
-                var Licence = new Models.Licence
+                if (ModelState.IsValid)
                 {
-                    Name = model.Name,
-                    Description = model.Description,
-                    Cost = model.Cost,
-                    ValidityMonths = model.ValidityMonths
-                };
+                    // Map the ViewModel to Licence entity
+                    var Licence = new Models.Licence
+                    {
+                        Name = model.Name,
+                        Description = model.Description,
+                        Cost = model.Cost,
+                        ValidityMonths = model.ValidityMonths
+                    };
 
-                // Add and save the new licence to the database
-                _context.Licences.Add(Licence);
-                await _context.SaveChangesAsync();
+                    // Add and save the new licence to the database
+                    _context.Licences.Add(Licence);
+                    await _context.SaveChangesAsync();
 
-                return RedirectToAction("Index");
+                    return RedirectToAction("Index");
+                }
+
+                return View(model);
             }
+            catch (DbUpdateException ex)
+            {
+                // Log the exception details
+                Console.WriteLine($"DbUpdateException: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
 
-            return View(model);
+                // Optionally, log additional details
+                // Log the SQL statement causing the exception
+                Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+                ModelState.AddModelError("", "An error occurred while saving data to the database.");
+                return View();
+            }            
         }
     }
 }

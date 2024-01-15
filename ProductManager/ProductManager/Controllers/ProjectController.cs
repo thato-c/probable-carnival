@@ -20,17 +20,34 @@ namespace ProductManager.Controllers
         public async Task<IActionResult> Index(int companyId)
         {
             ViewBag.CompanyId = companyId;
-            var projects = await _context.Projects.Where(p => p.CompanyId == companyId).ToListAsync();
 
-            if (projects != null && projects.Any())
+            try
             {
-                return View(projects);
-            }
-            else
+                var projects = await _context.Projects.Where(p => p.CompanyId == companyId).ToListAsync();
+
+                if (projects != null && projects.Any())
+                {
+                    return View(projects);
+                }
+                else
+                {
+                    ViewBag.Message = "No Projects have been created.";
+                    return View();
+                }
+            } 
+            catch (DbUpdateException ex)
             {
-                ViewBag.Message = "No Projects have been created.";
+                // Log the exception details
+                Console.WriteLine($"DbUpdateException: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+
+                // Optionally, log additional details
+                // Log the SQL statement causing the exception
+                Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+                ModelState.AddModelError("", "An error occurred while retrieving data from the database.");
                 return View();
-            }   
+            }
+               
         }
 
         [HttpGet]
@@ -48,39 +65,58 @@ namespace ProductManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateProject(ProjectViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // Map the ViewModel to Project Entity
-                var project = new Models.Project
+                if (ModelState.IsValid)
                 {
-                    Name = model.Name,
-                    CompanyId = model.CompanyId,
-                };
+                    // Map the ViewModel to Project Entity
+                    var project = new Models.Project
+                    {
+                        Name = model.Name,
+                        CompanyId = model.CompanyId,
+                    };
 
-                // Add and save the new project to the database
-                _context.Projects.Add(project);
-                await _context.SaveChangesAsync();
+                    // Add and save the new project to the database
+                    _context.Projects.Add(project);
+                    await _context.SaveChangesAsync();
 
-                // Send the CompanyId and ProjectId to the UserProjectAssignmentViewModel
-                var UserAssignmentViewModel = new UserAssignmentViewModel
+                    // Send the CompanyId and ProjectId to the UserProjectAssignmentViewModel
+                    var UserAssignmentViewModel = new UserAssignmentViewModel
+                    {
+                        CompanyId = model.CompanyId,
+                        ProjectId = project.ProjectId,
+                    };
+
+                    return RedirectToAction("UserAssignment", UserAssignmentViewModel);
+                }
+                else
                 {
-                    CompanyId = model.CompanyId,
-                    ProjectId = project.ProjectId,
-                };
-
-                return RedirectToAction("UserAssignment", UserAssignmentViewModel);
+                    return View("Create", model);
+                }
             }
-            else
+            catch (DbUpdateException ex)
             {
+                // Log the exception details
+                Console.WriteLine($"DbUpdateException: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+
+                // Optionally, log additional details
+                // Log the SQL statement causing the exception
+                Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+                ModelState.AddModelError("", "An error occurred while saving data to the database.");
                 return View("Create", model);
             }
+
+            
         }
 
         // Display the list of users (within the company)
         [HttpGet]
         public async Task<IActionResult> UserAssignment(UserAssignmentViewModel viewModel)
         {
-            var users = await _context.Users
+            try
+            {
+                var users = await _context.Users
                 .Where(u => u.CompanyId == viewModel.CompanyId)
                 .Select(u => new ProjectUserViewModel
                 {
@@ -89,24 +125,38 @@ namespace ProductManager.Controllers
                 })
                 .ToListAsync();
 
-            if (users != null && users.Any())
-            {
-                // Call ProjectUserAssignmentViewModel with the list of retrieved users
-                var ProjectUserAssignmentViewModel = new ProjectUserAssignmentViewModel
+                if (users != null && users.Any())
                 {
-                    ProjectId = viewModel.ProjectId,
-                    CompanyId = viewModel.CompanyId,
-                    ProjectUsers = users,
-                };
+                    // Call ProjectUserAssignmentViewModel with the list of retrieved users
+                    var ProjectUserAssignmentViewModel = new ProjectUserAssignmentViewModel
+                    {
+                        ProjectId = viewModel.ProjectId,
+                        CompanyId = viewModel.CompanyId,
+                        ProjectUsers = users,
+                    };
 
-                return View(ProjectUserAssignmentViewModel);
+                    return View(ProjectUserAssignmentViewModel);
+                }
+                else
+                {
+                    // No users Have been assigned to the company
+                    ViewBag.ProjectId = viewModel.ProjectId;
+                    return View();
+                }
             }
-            else
+            catch (DbUpdateException ex)
             {
-                // No users Have been assigned to the company
-                ViewBag.ProjectId = viewModel.ProjectId;
+                // Log the exception details
+                Console.WriteLine($"DbUpdateException: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+
+                // Optionally, log additional details
+                // Log the SQL statement causing the exception
+                Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+                ModelState.AddModelError("", "An error occurred while retrieving data from the database.");
                 return View();
             }
+            
         }
 
         // Assign selected users to the project
@@ -263,7 +313,7 @@ namespace ProductManager.Controllers
                 Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
 
                 ModelState.AddModelError("", "An error occurred while saving data to the database.");
-                return View("UserAssignment", viewModel);
+                return View("ProjectRole", viewModel);
             }           
         }
     }
