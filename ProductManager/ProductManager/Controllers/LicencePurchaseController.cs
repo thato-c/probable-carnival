@@ -34,9 +34,9 @@ namespace ProductManager.Controllers
             {
                 // Check if the Company already exists
                 var existingCompany = await _context.Companies.FirstOrDefaultAsync(c => 
-                    c.CompanyName == model.CompanyDetails.Name ||
-                    c.CompanyEmail == model.CompanyDetails.Email ||
-                    c.CompanyPhoneNumber == model.CompanyDetails.PhoneNumber);
+                    c.Name == model.CompanyDetails.Name ||
+                    c.Email == model.CompanyDetails.Email ||
+                    c.PhoneNumber == model.CompanyDetails.PhoneNumber);
 
                 if (existingCompany != null)
                 {
@@ -48,9 +48,9 @@ namespace ProductManager.Controllers
                     // Map viewModel to Company entity
                     var Company = new Models.Company
                     {
-                        CompanyName = model.CompanyDetails.Name,
-                        CompanyEmail = model.CompanyDetails.Email,
-                        CompanyPhoneNumber = model.CompanyDetails.PhoneNumber,
+                        Name = model.CompanyDetails.Name,
+                        Email = model.CompanyDetails.Email,
+                        PhoneNumber = model.CompanyDetails.PhoneNumber,
                     };
 
                     try
