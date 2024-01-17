@@ -1,0 +1,42 @@
+﻿@model ProductManager.ViewModels.RegistrationViewModel
+@{
+}
+
+<h1>Register Your Company</h1>
+
+<form asp-controller="Login" asp-action="Register" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <!-- Company Details -->
+    <fieldset>
+        <legend>Company Details</legend>
+        <div class="form-group">
+            <label asp-for="CompanyName">Name</label>
+            <input asp-for="CompanyName" class="form-control" />
+            <span asp-validation-for="CompanyName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CompanyPhoneNumber">Phone Number</label>
+            <input asp-for="CompanyPhoneNumber" class="form-control" />
+            <span asp-validation-for="CompanyPhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CompanyEmail">Email</label>
+            <input asp-for="CompanyEmail" class="form-control" />
+            <span asp-validation-for="CompanyEmail" class="text-danger"></span>
+        </div>
+    </fieldset>
+
+    <!-- Admin Details -->
+    <fieldset>
+        <legend>Admin Details</legend>
+        <div class="form-group">
+            <label asp-for="AdminEmail">Email</label>
+            <input asp-for="AdminEmail" class="form-control" />
+            <span asp-validation-for="AdminEmail" class="text-danger"></span>
+        </div>
+    </fieldset>
+
+    <button type="submit">Submit</button>
+</form>

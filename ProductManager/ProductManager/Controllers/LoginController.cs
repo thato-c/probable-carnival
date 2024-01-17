@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
+using ProductManager.Models;
 using ProductManager.ViewModels;
 using System.Security.Claims;
 
@@ -167,6 +168,94 @@ namespace ProductManager.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegistrationViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Check if the Company already exists
+                var existingCompany = await _context.Companies.FirstOrDefaultAsync(c =>
+                    c.CompanyName == model.CompanyName ||
+                    c.CompanyEmail == model.CompanyEmail ||
+                    c.CompanyPhoneNumber == model.CompanyPhoneNumber);
+
+                var existingAdmin = await _context.Users.FirstOrDefaultAsync(c =>
+                    c.Username == model.AdminEmail);
+
+                if (existingCompany != null || existingAdmin != null)
+                {
+                    ModelState.AddModelError("", "Company already exists");
+                    return View(model);
+                }
+                else
+                {
+                    // Map the viewModel to the Company entity
+                    var Company = new Models.Company
+                    {
+                        CompanyName = model.CompanyName,
+                        CompanyEmail = model.CompanyEmail,
+                        CompanyPhoneNumber = model.CompanyPhoneNumber,
+                    };
+
+                    try
+                    {
+                        _context.Companies.Add(Company);
+                        _context.SaveChanges();
+
+                        var password = GenerateUserPassword();
+                        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+
+                        var Admin = new Models.User
+                        {
+                            CompanyId = Company.CompanyId,
+                            Username = model.AdminEmail,
+                            Password = hashedPassword,
+                        };
+
+                        _context.Users.Add(Admin);
+                        _context.SaveChanges();
+
+                        return RedirectToAction("RegistrationSuccess");
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        // Log the exception details
+                        Console.WriteLine($"DbUpdateException: {ex.Message}");
+                        Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+
+                        // Optionally, log additional details
+                        // Log the SQL statement causing the exception
+                        Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+
+                        ModelState.AddModelError("", "An error occurred while saving data to the database.");
+                        return View(model);
+                    }  
+                }
+            }
+            else
+            {
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult RegistrationSuccess()
+        {
+            return View();
+        }
+
+        private string GenerateUserPassword()
+        {
+            return "qwe123!Q";
         }
 
         public IActionResult ContactAdmin()
