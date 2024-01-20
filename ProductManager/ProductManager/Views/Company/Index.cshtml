@@ -1,0 +1,59 @@
+﻿@model List<Company>
+@{
+}
+
+<h2>Companies</h2>
+
+<br />
+<a asp-controller="" asp-action="">Register a new Company</a>
+<br />
+<br />
+
+@if (Model != null)
+{
+    <table class="table">
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Phone Number
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+        </tr>
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            var company = Model[i];
+            if (company != null)
+            {
+                <tr>
+                    <td>
+                        @company.CompanyName
+                    </td>
+                    <td>
+                        @company.CompanyPhoneNumber
+                    </td>
+                    <td>
+                        @company.CompanyEmail
+                    </td>
+                    <td>
+                        <a asp-controller="Company" asp-action="Edit" asp-route-CompanyId="@company.CompanyId">Edit</a>
+                    </td>
+                    <td>
+                        Delete
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+}
+else
+{
+    <p>@ViewBag.Message</p>
+}

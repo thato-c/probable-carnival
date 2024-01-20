@@ -1,0 +1,65 @@
+﻿@model ProductManager.ViewModels.CompanyDetailsViewModel
+
+<h1>Edit Company Details</h1>
+
+@if (Model != null)
+{
+    <form>
+        <div class="form-group">
+
+            <fieldset>
+                <legend>Company Details</legend>
+                <div class="form-group">
+                    <label asp-for="CompanyName">Name</label>
+                    <input asp-for="CompanyName" value="@Model.CompanyName" class="form-control" />
+                    <span asp-validation-for="CompanyName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CompanyPhoneNumber">Pone Number</label>
+                    <input asp-for="CompanyPhoneNumber" class="form-control" />
+                    <span asp-validation-for="CompanyPhoneNumber" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CompanyEmail">Email</label>
+                    <input asp-for="CompanyEmail" class="form-control" />
+                    <span asp-validation-for="CompanyEmail" class="text-danger"></span>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Admin Details</legend>
+                <div class="form-group">
+                    <label asp-for="AdminEmail">Email</label>
+                    <input asp-for="AdminEmail" class="form-control" />
+                    <span asp-validation-for="AdminEmail" class="text-danger"></span>
+                </div>
+            </fieldset>
+
+            <!-- Needs Licence Payment Processing -->
+            <fieldset>
+                <legend>Licence Details</legend>
+                <div class="form-group">
+                    <label asp-for="LicenceName">Licence Type</label>
+                    <input asp-for="LicenceName" class="form-control" />
+                    <span asp-validation-for="LicenceName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Quantity">Quantity</label>
+                    <input asp-for="Quantity" class="form-control" />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="TotalCost">Total Cost</label>
+                    <input asp-for="TotalCost" class="form-control" />
+                    <span asp-validation-for="TotalCost" class="text-danger"></span>
+                </div>
+            </fieldset>
+        </div>
+    </form>
+}
+else
+{
+    <p>@ViewBag.Message</p>
+}
