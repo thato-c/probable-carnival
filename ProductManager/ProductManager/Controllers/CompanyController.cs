@@ -35,7 +35,12 @@ namespace ProductManager.Controllers
                     CompanyName = c.CompanyName,
                     CompanyPhoneNumber = c.CompanyPhoneNumber,
                     CompanyEmail = c.CompanyEmail,
-                    //LicenceName = organisation.Licences.FirstOrDefault()?.Name ?? "DefaultLicenceName",
+                    LicenceName = c.LicencePurchases
+                        .Join(_context.Licences, p => p.LicenceId, l => l.LicenceId, (p, l) => l.Name)
+                        .FirstOrDefault() ?? "Default Licence Name",
+                    AdminEmail = c.Users
+                        .Select(u => u.Username)
+                        .FirstOrDefault() ?? "Deafult Admin Email",
                     Quantity = c.LicencePurchases.Sum(purchase => (int?)purchase.Quantity) ?? 0,
                     TotalCost = c.LicencePurchases.Sum(purchase => (decimal?)purchase.TotalCost) ?? 0,
                 })
