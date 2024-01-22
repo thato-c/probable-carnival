@@ -44,6 +44,10 @@ namespace ProductManager.Controllers
                     {
                         // Create a list to hold the claims
                         var claims = new List<Claim>();
+                        
+                        // Add a ClaimType for username
+                        var username = user.Username;
+                        claims.Add(new Claim(ClaimTypes.Name, username.ToString()));
 
                         var userRole = await _context.UserRoles.FirstOrDefaultAsync(u => u.UserId == user.UserId);
 
@@ -59,9 +63,7 @@ namespace ProductManager.Controllers
 
                             if (userRole != null && userRole.Role.Name != null)
                             {
-                                var username = user.Username;
                                 claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
-                                claims.Add(new Claim(ClaimTypes.Name, username.ToString()));
                                 claims.Add(new Claim("ProjectName", projectName.ToString()));
 
                                 // Create a ClaimsIdentity and attach the claims to it.
@@ -106,36 +108,18 @@ namespace ProductManager.Controllers
                             {
                                 var companyHasProjects = _context.Projects.Any(p => p.CompanyId == user.CompanyId);
 
-                                if (companyHasProjects)
-                                {
-                                    claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
-                                    claims.Add(new Claim(ClaimTypes.Name, user.ToString()));
+                                claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
+                                claims.Add(new Claim(ClaimTypes.Name, user.ToString()));
 
-                                    // Create a ClaimsIdentity and attach the claims to it.
-                                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                                // Create a ClaimsIdentity and attach the claims to it.
+                                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                                    // Create a ClaimsPrincipal with the ClaimsIdentity
-                                    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                                // Create a ClaimsPrincipal with the ClaimsIdentity
+                                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-                                    // Sign in the user with the ClaimsPrincipal
-                                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
-                                    return RedirectToAction("Index", "Project", new { companyId = user.CompanyId });
-                                }
-                                else
-                                {
-                                    claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
-                                    claims.Add(new Claim(ClaimTypes.Name, user.ToString()));
-
-                                    // Create a ClaimsIdentity and attach the claims to it.
-                                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                                    // Create a ClaimsPrincipal with the ClaimsIdentity
-                                    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-                                    // Sign in the user with the ClaimsPrincipal
-                                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
-                                    return RedirectToAction("Create", "Project", new { companyId = user.CompanyId });
-                                }
+                                // Sign in the user with the ClaimsPrincipal
+                                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+                                return RedirectToAction("Index", "Project", new { companyId = user.CompanyId });
                             }
                         }
                     }
@@ -222,6 +206,15 @@ namespace ProductManager.Controllers
                         };
 
                         _context.Users.Add(Admin);
+                        _context.SaveChanges();
+
+                        var userRole = new Models.UserRole
+                        {
+                            UserId = Admin.UserId,
+                            RoleId = 4,
+                        };
+
+                        _context.UserRoles.Add(userRole);
                         _context.SaveChanges();
 
                         return RedirectToAction("RegistrationSuccess");
