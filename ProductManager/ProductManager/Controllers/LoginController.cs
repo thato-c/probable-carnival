@@ -106,10 +106,7 @@ namespace ProductManager.Controllers
                             // User  has a role of Company Admin
                             else if (userRole != null && userRole.Role != null && userRole.Role.Name == "Company Administrator")
                             {
-                                var companyHasProjects = _context.Projects.Any(p => p.CompanyId == user.CompanyId);
-
                                 claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
-                                claims.Add(new Claim(ClaimTypes.Name, user.ToString()));
 
                                 // Create a ClaimsIdentity and attach the claims to it.
                                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
