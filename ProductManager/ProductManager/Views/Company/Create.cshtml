@@ -5,7 +5,7 @@
 
 <h1>Purchase a Licence</h1>
 
-<form asp-controller="LicencePurchase" asp-action="Create" method="post">
+<form asp-controller="Company" asp-action="Create" method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="form-group">
@@ -27,14 +27,23 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="LicenceName">Licence</label>
-        <select asp-for="LicenceName" id="SelectedLicence" class="form-control">
-            @foreach (var licence in Model.Licences)
+        <label asp-for="AdminEmail">Admin Email</label>
+        <input asp-for="AdminEmail" class="form-control" />
+        <span asp-validation-for="AdminEmail" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SelectedLicenceId">Licence</label>
+        <select asp-for="SelectedLicenceId" id="SelectedLicence" class="form-control">
+            @if (Model != null && Model.Licences != null)
             {
-                <option value="@licence.Value" data-cost="@licence.Cost">@licence.Text</option>
+                foreach (var licence in Model.Licences)
+                {
+                    <option value="@licence.Value" data-cost="@licence.Cost">@licence.Text</option>
+                }
             }
         </select>
-        <span asp-validation-for="LicenceName" class="text-danger"></span>
+        <span asp-validation-for="SelectedLicenceId" class="text-danger"></span>
     </div>
 
     <div class="form-group">

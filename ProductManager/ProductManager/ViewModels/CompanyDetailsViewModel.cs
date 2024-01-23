@@ -24,10 +24,11 @@ namespace ProductManager.ViewModels
         public string AdminEmail { get; set; }
 
         // Company Licencing Properties
-        [Required(ErrorMessage = "Licence name is required")]
-        public string LicenceName { get; set; }
+        [Display(Name = "Licence")]
+        [Required(ErrorMessage = "Licence is required")]
+        public int SelectedLicenceId { get; set; }
 
-        public IEnumerable<LicenceDropDownItem> Licences { get; set; }
+        public IEnumerable<LicenceDropDownItem>? Licences { get; set; }
 
         [Column(TypeName = "decimal(10, 2)")]
         [Required(ErrorMessage = "Licence Cost is required")]
