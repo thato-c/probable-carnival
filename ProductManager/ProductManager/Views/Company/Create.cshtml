@@ -28,7 +28,12 @@
 
     <div class="form-group">
         <label asp-for="LicenceName">Licence</label>
-        <select asp-for="LicenceName" asp-items="ViewBag.Licences"></select>
+        <select asp-for="LicenceName" id="SelectedLicence" class="form-control">
+            @foreach (var licence in Model.Licences)
+            {
+                <option value="@licence.Value" data-cost="@licence.Cost">@licence.Text</option>
+            }
+        </select>
         <span asp-validation-for="LicenceName" class="text-danger"></span>
     </div>
 
@@ -64,12 +69,14 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         updateTotalCost();
+        var totalCostInput = document.getElementById("TotalCost");
     });
 
     var quantityInput = document.getElementById("Quantity");
     var totalCostInput = document.getElementById("TotalCost");
     var decrementButton = document.getElementById("decrementQuantity");
     var incrementButton = document.getElementById("incrementQuantity");
+    var selectedLicence = document.getElementById("SelectedLicence")
 
     decrementButton.addEventListener("click", function () {
         // Decrement the quantity when the "-" button is clicked
@@ -85,10 +92,26 @@
         updateTotalCost();
     });
 
+    selectedLicence.addEventListener("click", function () {
+        updateTotalCost();
+    })
+
     function updateTotalCost() {
         var quantity = parseInt(quantityInput.value);
-        var cost = @Html.Raw(Json.Serialize(Model.LicenceCost));
+        var selectedIndex = selectedLicence.selectedIndex;
 
+        if (selectedIndex !== -1){
+            var cost = parseFloat(selectedLicence.options[selectedIndex].getAttribute("data-cost"));
+
+            if (!isNaN(quantity) && !isNaN(cost)) {
+                var totalCost = quantity * cost;
+                totalCost = totalCost.toFixed(2);
+                var formattedValue = totalCost.toString().replace('.', ',');
+                totalCostInput.value = formattedValue;
+            } else {
+                totalCostInput.value = "";
+            }
+        }
         if (!isNaN(quantity)) {
             var totalCost = parseFloat(quantity) * parseFloat(cost);
             totalCost = totalCost.toFixed(2);

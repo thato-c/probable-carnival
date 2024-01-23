@@ -49,21 +49,23 @@ namespace ProductManager.Controllers
         public async Task<IActionResult> Create()
         {
             var licences = await _context.Licences
-                .Select(l => new SelectListItem
+                .Select(l => new LicenceDropDownItem
                 {
                     Value  = l.LicenceId.ToString(),
                     Text = l.Name,
+                    Cost = l.Cost.ToString()
                 }).ToListAsync();
 
-            ViewBag.Licences = new SelectList(licences, "Value", "Text");
-
-            var viewModel = new CompanyDetailsViewModel();
-
-            viewModel.Quantity = 1;
-            viewModel.PurchaseDate = DateTime.Now;
+            var viewModel = new CompanyDetailsViewModel 
+            { 
+                Licences = licences,
+                Quantity = 1,
+                PurchaseDate = DateTime.Now,
+            };
 
             return View(viewModel);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Edit(int CompanyId)

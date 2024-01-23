@@ -27,6 +27,8 @@ namespace ProductManager.ViewModels
         [Required(ErrorMessage = "Licence name is required")]
         public string LicenceName { get; set; }
 
+        public IEnumerable<LicenceDropDownItem> Licences { get; set; }
+
         [Column(TypeName = "decimal(10, 2)")]
         [Required(ErrorMessage = "Licence Cost is required")]
         public decimal LicenceCost { get; set; }
