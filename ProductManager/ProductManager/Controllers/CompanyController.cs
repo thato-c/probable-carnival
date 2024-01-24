@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
+using ProductManager.Models;
 using ProductManager.ViewModels;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace ProductManager.Controllers
 {
@@ -206,30 +208,7 @@ namespace ProductManager.Controllers
         {
             try
             {
-                var registeredCompany = await _context.Companies
-                .Where(c => c.CompanyId == CompanyId)
-                .Select(c => new CompanyDetailsViewModel
-                {
-                    CompanyName = c.CompanyName,
-                    CompanyPhoneNumber = c.CompanyPhoneNumber,
-                    CompanyEmail = c.CompanyEmail,
-                    SelectedLicenceId = c.LicencePurchases
-                        .Select(p => p.LicenceId)
-                        .FirstOrDefault(),
-                    AdminEmail = c.Users
-                        .Select(u => u.Username)
-                        .FirstOrDefault() ?? "",
-                    Quantity = c.LicencePurchases.Sum(purchase => (int?)purchase.Quantity) ?? 1,
-                    TotalCost = c.LicencePurchases.Sum(purchase => (decimal?)purchase.TotalCost) ?? 0,
-                    PurchaseDate = c.LicencePurchases
-                        .Select(p => p.PurchaseDate)
-                        .FirstOrDefault(),
-                })
-                .FirstOrDefaultAsync();
-
-                if (registeredCompany != null)
-                {
-                    var licences = await _context.Licences
+                var licences = await _context.Licences
                         .Select(l => new LicenceDropDownItem
                         {
                             Value = l.LicenceId.ToString(),
@@ -237,20 +216,32 @@ namespace ProductManager.Controllers
                             Cost = l.Cost.ToString()
                         }).ToListAsync();
 
-                    var viewModel = new CompanyDetailsViewModel
+                var registeredCompany = await _context.Companies
+                    .Where(c => c.CompanyId == CompanyId)
+                    .Select(c => new CompanyDetailsViewModel
                     {
-                        CompanyName = registeredCompany.CompanyName,
-                        CompanyPhoneNumber = registeredCompany.CompanyPhoneNumber,
-                        CompanyEmail = registeredCompany.CompanyEmail,
-                        AdminEmail = registeredCompany.AdminEmail,
-                        SelectedLicenceId = registeredCompany.SelectedLicenceId,
+                        CompanyId = c.CompanyId,
+                        CompanyName = c.CompanyName,
+                        CompanyPhoneNumber = c.CompanyPhoneNumber,
+                        CompanyEmail = c.CompanyEmail,
+                        SelectedLicenceId = c.LicencePurchases
+                            .Select(p => p.LicenceId)
+                            .FirstOrDefault(),
+                        AdminEmail = c.Users
+                            .Select(u => u.Username)
+                            .FirstOrDefault() ?? "",
                         Licences = licences,
-                        Quantity = registeredCompany.Quantity,
-                        PurchaseDate = registeredCompany.PurchaseDate,
-                        TotalCost = registeredCompany.TotalCost
-                    };
+                        Quantity = c.LicencePurchases.Sum(purchase => (int?)purchase.Quantity) ?? 0,
+                        TotalCost = c.LicencePurchases.Sum(purchase => (decimal?)purchase.TotalCost) ?? 0,
+                        PurchaseDate = c.LicencePurchases
+                            .Select(p => (DateTime?)p.PurchaseDate)
+                            .FirstOrDefault() ?? DateTime.Now,
+                    })
+                    .FirstOrDefaultAsync();
 
-                    return View(viewModel);
+                if (registeredCompany != null)
+                {
+                    return View(registeredCompany);
                 }
 
                 ViewBag.Message = "The Company does not exist";
@@ -269,6 +260,104 @@ namespace ProductManager.Controllers
                 return View();
             }
             
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(CompanyDetailsViewModel viewModel)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var previousPurchase = await _context.LicencePurchases
+                        .Where(p => p.CompanyId == viewModel.CompanyId)
+                        .FirstOrDefaultAsync();
+
+                    var purchase = new Models.LicencePurchase
+                    {
+                        CompanyId = viewModel.CompanyId,
+                        LicenceId = viewModel.SelectedLicenceId,
+                        Quantity = viewModel.Quantity,
+                        PurchaseDate = viewModel.PurchaseDate,
+                        TotalCost = viewModel.TotalCost
+                    };
+
+                    if (previousPurchase == null)
+                    {
+                        _context.LicencePurchases.Add(purchase);
+                    }
+                    else
+                    {
+                        purchase.PurchaseId = previousPurchase.PurchaseId;
+                        _context.Entry(purchase).State = EntityState.Modified;
+                    }
+
+                    for (var i = 0; i < viewModel.Quantity - 1; i++)
+                    {
+                        var user = new Models.User
+                        {
+                            CompanyId = viewModel.CompanyId,
+                            Username = await GenerateUsername(viewModel.CompanyName),
+                            Password = GenerateUserPassword(),
+                        };
+                        _context.Users.Add(user);
+                    }
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                }
+
+                var licences = await _context.Licences
+                    .Select(l => new LicenceDropDownItem
+                    {
+                        Value = l.LicenceId.ToString(),
+                        Text = l.Name,
+                        Cost = l.Cost.ToString()
+                    }).ToListAsync();
+
+                var model = new CompanyDetailsViewModel
+                {
+                    Licences = licences,
+                    Quantity = viewModel.Quantity,
+                    PurchaseDate = viewModel.PurchaseDate,
+                };
+
+                return View(viewModel);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the exception details
+                Console.WriteLine($"DbUpdateException: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+
+                // Optionally, log additional details
+                // Log the SQL statement causing the exception
+                Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+                ModelState.AddModelError("", "An error occurred while saving data to the database.");
+
+                var licences = await _context.Licences
+                    .Select(l => new LicenceDropDownItem
+                    {
+                        Value = l.LicenceId.ToString(),
+                        Text = l.Name,
+                        Cost = l.Cost.ToString()
+                    }).ToListAsync();
+
+                var model = new CompanyDetailsViewModel
+                {
+                    CompanyId = viewModel.CompanyId,
+                    CompanyName = viewModel.CompanyName,
+                    CompanyPhoneNumber = viewModel.CompanyPhoneNumber,
+                    CompanyEmail = viewModel.CompanyEmail,
+                    SelectedLicenceId = viewModel.SelectedLicenceId,
+                    AdminEmail = viewModel.AdminEmail,
+                    Licences = licences,
+                    Quantity = viewModel.Quantity,
+                    PurchaseDate = viewModel.PurchaseDate,
+                    TotalCost = viewModel.TotalCost,
+                };
+                return View();
+            }
         }
 
         private string GenerateUserPassword()

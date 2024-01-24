@@ -6,6 +6,8 @@ namespace ProductManager.ViewModels
     public class CompanyDetailsViewModel
     {
         // Compnay properties
+        public int CompanyId { get; set; }
+
         [Required(ErrorMessage = "Company Name is required")]
         [StringLength(50)]
         public string CompanyName { get; set; }
