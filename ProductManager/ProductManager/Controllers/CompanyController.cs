@@ -83,6 +83,7 @@ namespace ProductManager.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CompanyDetailsViewModel viewModel)
         {
             try
@@ -92,8 +93,6 @@ namespace ProductManager.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    // Check if the Company already exists
-
                     var existingCompany = await _context.Companies.FirstOrDefaultAsync(c =>
                         c.CompanyName == viewModel.CompanyName ||
                         c.CompanyEmail == viewModel.CompanyEmail ||
@@ -214,20 +213,44 @@ namespace ProductManager.Controllers
                     CompanyName = c.CompanyName,
                     CompanyPhoneNumber = c.CompanyPhoneNumber,
                     CompanyEmail = c.CompanyEmail,
-                    //SelectedLicenceId = c.LicencePurchases
-                    //    .Join(_context.Licences, p => p.LicenceId, l => l.LicenceId, (p, l) => l.Name)
-                    //    .FirstOrDefault() ?? "Default Licence Name",
+                    SelectedLicenceId = c.LicencePurchases
+                        .Select(p => p.LicenceId)
+                        .FirstOrDefault(),
                     AdminEmail = c.Users
                         .Select(u => u.Username)
-                        .FirstOrDefault() ?? "Defult Admin Email",
-                    Quantity = c.LicencePurchases.Sum(purchase => (int?)purchase.Quantity) ?? 0,
+                        .FirstOrDefault() ?? "",
+                    Quantity = c.LicencePurchases.Sum(purchase => (int?)purchase.Quantity) ?? 1,
                     TotalCost = c.LicencePurchases.Sum(purchase => (decimal?)purchase.TotalCost) ?? 0,
+                    PurchaseDate = c.LicencePurchases
+                        .Select(p => p.PurchaseDate)
+                        .FirstOrDefault(),
                 })
                 .FirstOrDefaultAsync();
 
                 if (registeredCompany != null)
                 {
-                    return View(registeredCompany);
+                    var licences = await _context.Licences
+                        .Select(l => new LicenceDropDownItem
+                        {
+                            Value = l.LicenceId.ToString(),
+                            Text = l.Name,
+                            Cost = l.Cost.ToString()
+                        }).ToListAsync();
+
+                    var viewModel = new CompanyDetailsViewModel
+                    {
+                        CompanyName = registeredCompany.CompanyName,
+                        CompanyPhoneNumber = registeredCompany.CompanyPhoneNumber,
+                        CompanyEmail = registeredCompany.CompanyEmail,
+                        AdminEmail = registeredCompany.AdminEmail,
+                        SelectedLicenceId = registeredCompany.SelectedLicenceId,
+                        Licences = licences,
+                        Quantity = registeredCompany.Quantity,
+                        PurchaseDate = registeredCompany.PurchaseDate,
+                        TotalCost = registeredCompany.TotalCost
+                    };
+
+                    return View(viewModel);
                 }
 
                 ViewBag.Message = "The Company does not exist";
