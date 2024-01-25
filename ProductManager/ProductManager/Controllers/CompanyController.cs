@@ -202,7 +202,6 @@ namespace ProductManager.Controllers
             }
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Edit(int CompanyId)
         {
@@ -274,34 +273,81 @@ namespace ProductManager.Controllers
                         .Where(p => p.CompanyId == viewModel.CompanyId)
                         .FirstOrDefaultAsync();
 
-                    var purchase = new Models.LicencePurchase
-                    {
-                        CompanyId = viewModel.CompanyId,
-                        LicenceId = viewModel.SelectedLicenceId,
-                        Quantity = viewModel.Quantity,
-                        PurchaseDate = viewModel.PurchaseDate,
-                        TotalCost = viewModel.TotalCost
-                    };
-
                     if (previousPurchase == null)
                     {
+                        var purchase = new Models.LicencePurchase
+                        {
+                            CompanyId = viewModel.CompanyId,
+                            LicenceId = viewModel.SelectedLicenceId,
+                            Quantity = viewModel.Quantity,
+                            PurchaseDate = viewModel.PurchaseDate,
+                            TotalCost = viewModel.TotalCost
+                        };
                         _context.LicencePurchases.Add(purchase);
+
+                        for (var i = 0; i < viewModel.Quantity - 1; i++)
+                        {
+                            var user = new Models.User
+                            {
+                                CompanyId = viewModel.CompanyId,
+                                Username = await GenerateUsername(viewModel.CompanyName),
+                                Password = GenerateUserPassword(),
+                            };
+                            _context.Users.Add(user);
+                        }
                     }
                     else
                     {
-                        purchase.PurchaseId = previousPurchase.PurchaseId;
-                        _context.Entry(purchase).State = EntityState.Modified;
-                    }
+                        // These properties will be updated
+                        previousPurchase.LicenceId = viewModel.SelectedLicenceId;
+                        previousPurchase.Quantity = viewModel.Quantity;
+                        previousPurchase.PurchaseDate = DateTime.Now;
+                        previousPurchase.TotalCost = viewModel.TotalCost;
+                        _context.Entry(previousPurchase).State = EntityState.Modified;
 
-                    for (var i = 0; i < viewModel.Quantity - 1; i++)
-                    {
-                        var user = new Models.User
+                        // In the event that the Quantity has been increased
+                        var newUsers = viewModel.Quantity - previousPurchase.Quantity;
+
+                        if (newUsers > 0)
                         {
-                            CompanyId = viewModel.CompanyId,
-                            Username = await GenerateUsername(viewModel.CompanyName),
-                            Password = GenerateUserPassword(),
-                        };
-                        _context.Users.Add(user);
+                            for (var i = 0; i < newUsers; i++)
+                            {
+                                var user = new Models.User
+                                {
+                                    CompanyId = viewModel.CompanyId,
+                                    Username = await GenerateUsername(viewModel.CompanyName),
+                                    Password = GenerateUserPassword(),
+                                };
+                                _context.Users.Add(user);
+                            }
+                        }
+                        else if (newUsers < 0)
+                        {
+                            var newLicences = await _context.Licences
+                                .Select(l => new LicenceDropDownItem
+                                {
+                                    Value = l.LicenceId.ToString(),
+                                    Text = l.Name,
+                                    Cost = l.Cost.ToString()
+                                }).ToListAsync();
+
+                            var newModel = new CompanyDetailsViewModel
+                            {
+                                CompanyId = viewModel.CompanyId,
+                                CompanyName = viewModel.CompanyName,
+                                CompanyPhoneNumber = viewModel.CompanyPhoneNumber,
+                                CompanyEmail = viewModel.CompanyEmail,
+                                SelectedLicenceId = viewModel.SelectedLicenceId,
+                                AdminEmail = viewModel.AdminEmail,
+                                Licences = newLicences,
+                                Quantity = previousPurchase.Quantity,
+                                TotalCost = previousPurchase.TotalCost,
+                                PurchaseDate = previousPurchase.PurchaseDate,
+                            };
+
+                            ModelState.AddModelError("", "The quantity of users cannot be decreased from this view");
+                            return View(newModel);
+                        }  
                     }
                     await _context.SaveChangesAsync();
                     return RedirectToAction("Index");
@@ -317,12 +363,19 @@ namespace ProductManager.Controllers
 
                 var model = new CompanyDetailsViewModel
                 {
+                    CompanyId = viewModel.CompanyId,
+                    CompanyName = viewModel.CompanyName,
+                    CompanyPhoneNumber = viewModel.CompanyPhoneNumber,
+                    CompanyEmail = viewModel.CompanyEmail,
+                    SelectedLicenceId = viewModel.SelectedLicenceId,
+                    AdminEmail = viewModel.AdminEmail,
                     Licences = licences,
                     Quantity = viewModel.Quantity,
                     PurchaseDate = viewModel.PurchaseDate,
+                    TotalCost = viewModel.TotalCost,
                 };
 
-                return View(viewModel);
+                return View(model);
             }
             catch (DbUpdateException ex)
             {
@@ -356,7 +409,7 @@ namespace ProductManager.Controllers
                     PurchaseDate = viewModel.PurchaseDate,
                     TotalCost = viewModel.TotalCost,
                 };
-                return View();
+                return View(model);
             }
         }
 
