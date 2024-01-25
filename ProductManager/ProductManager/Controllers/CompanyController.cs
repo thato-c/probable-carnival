@@ -273,6 +273,35 @@ namespace ProductManager.Controllers
                         .Where(p => p.CompanyId == viewModel.CompanyId)
                         .FirstOrDefaultAsync();
 
+                    // Check if the data sent is similar to the data sent to the view initially
+                    if (previousPurchase.Quantity == viewModel.Quantity && previousPurchase.LicenceId == viewModel.SelectedLicenceId) 
+                    {
+                        var newLicences = await _context.Licences
+                                .Select(l => new LicenceDropDownItem
+                                {
+                                    Value = l.LicenceId.ToString(),
+                                    Text = l.Name,
+                                    Cost = l.Cost.ToString()
+                                }).ToListAsync();
+
+                        var newModel = new CompanyDetailsViewModel
+                        {
+                            CompanyId = viewModel.CompanyId,
+                            CompanyName = viewModel.CompanyName,
+                            CompanyPhoneNumber = viewModel.CompanyPhoneNumber,
+                            CompanyEmail = viewModel.CompanyEmail,
+                            SelectedLicenceId = viewModel.SelectedLicenceId,
+                            AdminEmail = viewModel.AdminEmail,
+                            Licences = newLicences,
+                            Quantity = previousPurchase.Quantity,
+                            TotalCost = previousPurchase.TotalCost,
+                            PurchaseDate = previousPurchase.PurchaseDate,
+                        };
+
+                        ModelState.AddModelError("", "The data has not been modified");
+                        return View(newModel);
+                    }
+
                     if (previousPurchase == null)
                     {
                         var purchase = new Models.LicencePurchase
@@ -285,7 +314,7 @@ namespace ProductManager.Controllers
                         };
                         _context.LicencePurchases.Add(purchase);
 
-                        for (var i = 0; i < viewModel.Quantity - 1; i++)
+                        for (var i = 0; i < viewModel.Quantity; i++)
                         {
                             var user = new Models.User
                             {
@@ -298,15 +327,15 @@ namespace ProductManager.Controllers
                     }
                     else
                     {
+                        // In the event that the Quantity has been increased
+                        var newUsers = viewModel.Quantity - previousPurchase.Quantity;
+
                         // These properties will be updated
                         previousPurchase.LicenceId = viewModel.SelectedLicenceId;
                         previousPurchase.Quantity = viewModel.Quantity;
                         previousPurchase.PurchaseDate = DateTime.Now;
                         previousPurchase.TotalCost = viewModel.TotalCost;
-                        _context.Entry(previousPurchase).State = EntityState.Modified;
-
-                        // In the event that the Quantity has been increased
-                        var newUsers = viewModel.Quantity - previousPurchase.Quantity;
+                        _context.Entry(previousPurchase).State = EntityState.Modified; 
 
                         if (newUsers > 0)
                         {
