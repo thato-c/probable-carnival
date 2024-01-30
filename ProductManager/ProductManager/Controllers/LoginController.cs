@@ -186,7 +186,7 @@ namespace ProductManager.Controllers
                             CompanyEmail = model.CompanyEmail,
                             CompanyPhoneNumber = model.CompanyPhoneNumber,
                             AdminEmail = model.AdminEmail,
-                            Payment = "Unpaid",
+                            PaymentStatus = PaymentStatus.Unpaid,
                         };
                         _context.Companies.Add(Company);
                         _context.SaveChanges();

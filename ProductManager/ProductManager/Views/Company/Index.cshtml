@@ -23,6 +23,9 @@
                 Email
             </th>
             <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["PaymentSortParm"]"> Payment Status</a>  
+            </th>
+            <th>
             </th>
             <th>
             </th>
@@ -41,6 +44,9 @@
                     </td>
                     <td>
                         @company.CompanyEmail
+                    </td>
+                    <td>
+                        @company.PaymentStatus
                     </td>
                     <td>
                         <a asp-controller="Company" asp-action="Edit" asp-route-CompanyId="@company.CompanyId">Edit</a>

@@ -19,7 +19,7 @@ namespace ProductManager.Models
         [EmailAddress]
         public string CompanyEmail { get; set; } = string.Empty;
 
-        public string Payment { get; set; } = "Unpaid";
+        public PaymentStatus PaymentStatus { get; set; }
 
         [Required(ErrorMessage = "Admin Email is required")]
         [EmailAddress]
@@ -32,5 +32,12 @@ namespace ProductManager.Models
         public ICollection<User> Users { get; set; }
 
         public ICollection<Project> Projects { get; set; }
+    }
+
+    public enum PaymentStatus
+    {
+        Unpaid,
+        Processing,
+        Paid,
     }
 }

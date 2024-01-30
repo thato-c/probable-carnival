@@ -23,6 +23,7 @@ namespace ProductManager.Controllers
             try
             {
                 ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+                ViewData["PaymentSortParm"] = sortOrder == "payment" ? "payment_desc" : "payment";
                 var companies = await _context.Companies.AsNoTracking().ToListAsync();
 
                 if (companies.Count == 0)
@@ -36,6 +37,13 @@ namespace ProductManager.Controllers
                     case "name_desc":
                         companies = companies.OrderByDescending(d => d.CompanyName).ToList();
                         break;
+                    case "payment_desc":
+                        companies = companies.OrderByDescending(d => d.PaymentStatus).ToList();
+                        break;
+                    case "payment":
+                        companies = companies.OrderBy(d => d.PaymentStatus).ToList();
+                        break;
+
                     default:
                         companies = companies.OrderBy(d => d.CompanyName).ToList(); 
                         break;
@@ -140,7 +148,7 @@ namespace ProductManager.Controllers
                             CompanyEmail = viewModel.CompanyEmail,
                             CompanyPhoneNumber = viewModel.CompanyPhoneNumber,
                             AdminEmail = viewModel.AdminEmail,
-                            Payment = "Processing",
+                            PaymentStatus = PaymentStatus.Processing,
                         };
                         _context.Companies.Add(company);
                         await _context.SaveChangesAsync();
