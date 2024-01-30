@@ -18,16 +18,26 @@ namespace ProductManager.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string sortOrder, string searchString)
+        public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? pageNumber)
         {
             try
             {
+                
                 ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
                 ViewData["PaymentSortParm"] = sortOrder == "payment" ? "payment_desc" : "payment";
+                ViewData["CurrentSort"] = sortOrder;
+                if (searchString != null)
+                {
+                    pageNumber = 1;
+                }
+                else
+                {
+                    searchString = currentFilter;
+                }
                 ViewData["CurrentFilter"] = searchString;
-                var companies = await _context.Companies.AsNoTracking().ToListAsync();
+                var companies = from c in _context.Companies select c;
 
-                if (companies.Count == 0)
+                if (!companies.Any())
                 {
                     ViewBag.Message = "No Companies have Registered";
                     return View();
@@ -38,27 +48,28 @@ namespace ProductManager.Controllers
                     companies = companies.Where(c => c.CompanyName.Contains(searchString) ||
                     c.CompanyEmail.Contains(searchString) ||
                     c.AdminEmail.Contains(searchString)
-                    ).ToList();
+                    );
                 }
 
                 switch (sortOrder)
                 {
                     case "name_desc":
-                        companies = companies.OrderByDescending(d => d.CompanyName).ToList();
-                        break;
+                        companies = companies.OrderByDescending(d => d.CompanyName);
+                        break;  
                     case "payment_desc":
-                        companies = companies.OrderByDescending(d => d.PaymentStatus).ToList();
+                        companies = companies.OrderByDescending(d => d.PaymentStatus);
                         break;
                     case "payment":
-                        companies = companies.OrderBy(d => d.PaymentStatus).ToList();
+                        companies = companies.OrderBy(d => d.PaymentStatus);
                         break;
 
                     default:
-                        companies = companies.OrderBy(d => d.CompanyName).ToList(); 
+                        companies = companies.OrderBy(d => d.CompanyName); 
                         break;
                 }
 
-                return View(companies);
+                int pageSize = 10;
+                return View(await PaginatedList<Company>.CreateAsync(companies.AsNoTracking(), pageNumber ?? 1, pageSize));
             }
             catch (DbUpdateException ex)
             {

@@ -1,4 +1,4 @@
-﻿@model List<Company>
+﻿@model PaginatedList<Company>
 @{
 }
 
@@ -13,7 +13,7 @@
     <div class="form-actions no-color">
         <p>
             Filter: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
-            <input type="submit" value="Search" class="btn btn-default" /> | 
+            <input type="submit" value="Search" class="btn btn-default" /> |
             <a asp-action="Index">Back to Full List</a>
         </p>
     </div>
@@ -24,7 +24,7 @@
     <table class="table">
         <tr>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">Name</a>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Name</a>
             </th>
             <th>
                 Phone Number
@@ -36,46 +36,63 @@
                 Admin
             </th>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["PaymentSortParm"]"> Payment Status</a>  
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["PaymentSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]"> Payment Status</a>
             </th>
             <th>
             </th>
             <th>
             </th>
         </tr>
-        @for (var i = 0; i < Model.Count; i++)
+        @foreach (var item in Model)
         {
-            var company = Model[i];
-            if (company != null)
-            {
-                <tr>
-                    <td>
-                        @company.CompanyName
-                    </td>
-                    <td>
-                        @company.CompanyPhoneNumber
-                    </td>
-                    <td>
-                        @company.CompanyEmail
-                    </td>
-                    <td>
-                        @company.AdminEmail
-                    </td>
-                    <td>
-                        @company.PaymentStatus
-                    </td>
-                    <td>
-                        <a asp-controller="Company" asp-action="Edit" asp-route-CompanyId="@company.CompanyId">Edit</a>
-                    </td>
-                    <td>
-                        Delete
-                    </td>
-                </tr>
-            }
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CompanyName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CompanyPhoneNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CompanyEmail)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AdminEmail)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PaymentStatus)
+                </td>
+                <td>
+                    <a asp-controller="Company" asp-action="Edit" asp-route-CompanyId="@item.CompanyId">Edit</a>
+                </td>
+                <td>
+                    Delete
+                </td>
+            </tr>
+
         }
     </table>
 }
 else
 {
-    <p>@ViewBag.Message</p>
+    <p>ViewModel.Message</p>
 }
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
