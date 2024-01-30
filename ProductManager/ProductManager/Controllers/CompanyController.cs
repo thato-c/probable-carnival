@@ -18,10 +18,11 @@ namespace ProductManager.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
             try
             {
+                ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
                 var companies = await _context.Companies.AsNoTracking().ToListAsync();
 
                 if (companies.Count == 0)
@@ -29,6 +30,17 @@ namespace ProductManager.Controllers
                     ViewBag.Message = "No Companies have Registered";
                     return View();
                 }
+
+                switch (sortOrder)
+                {
+                    case "name_desc":
+                        companies = companies.OrderByDescending(d => d.CompanyName).ToList();
+                        break;
+                    default:
+                        companies = companies.OrderBy(d => d.CompanyName).ToList(); 
+                        break;
+                }
+
                 return View(companies);
             }
             catch (DbUpdateException ex)
