@@ -22,7 +22,7 @@ namespace ProductManager.Controllers
         {
             try
             {
-                var companies = await _context.Companies.ToListAsync();
+                var companies = await _context.Companies.AsNoTracking().ToListAsync();
 
                 if (companies.Count == 0)
                 {
@@ -88,22 +88,87 @@ namespace ProductManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CompanyDetailsViewModel viewModel)
         {
-            //try
-            //{
-            //    // 1. Verify Email
-            //    // 2. Confirm Payment
-
-            if (ModelState.IsValid)
+            try
             {
-                var existingCompany = await _context.Companies.FirstOrDefaultAsync(c =>
-                    c.CompanyName == viewModel.CompanyName ||
-                    c.CompanyEmail == viewModel.CompanyEmail ||
-                    c.AdminEmail == viewModel.AdminEmail ||
-                    c.CompanyPhoneNumber == viewModel.CompanyPhoneNumber);
+                // 1. Verify Email
+                // 2. Confirm Payment
 
-                if (existingCompany != null)
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("", "Company with the same details already exists.");
+                    var existingCompany = await _context.Companies.FirstOrDefaultAsync(c =>
+                        c.CompanyName == viewModel.CompanyName ||
+                        c.CompanyEmail == viewModel.CompanyEmail ||
+                        c.AdminEmail == viewModel.AdminEmail ||
+                        c.CompanyPhoneNumber == viewModel.CompanyPhoneNumber);
+
+                    if (existingCompany != null)
+                    {
+                        ModelState.AddModelError("", "Company with the same details already exists.");
+                        var licences = await _context.Licences
+                        .Select(l => new LicenceDropDownItem
+                        {
+                            Value = l.LicenceId.ToString(),
+                            Text = l.Name,
+                            Cost = l.Cost.ToString()
+                        }).ToListAsync();
+
+                        var model = new CompanyDetailsViewModel
+                        {
+                            Licences = licences,
+                            Quantity = 1,
+                            PurchaseDate = DateTime.Now,
+                        };
+                        return View(model);
+                    }
+                    else
+                    {
+                        var company = new Models.Company
+                        {
+                            CompanyName = viewModel.CompanyName,
+                            CompanyEmail = viewModel.CompanyEmail,
+                            CompanyPhoneNumber = viewModel.CompanyPhoneNumber,
+                            AdminEmail = viewModel.AdminEmail,
+                            Payment = "Processing",
+                        };
+                        _context.Companies.Add(company);
+                        await _context.SaveChangesAsync();
+
+                        var purchase = new Models.LicencePurchase
+                        {
+                            CompanyId = company.CompanyId,
+                            LicenceId = viewModel.SelectedLicenceId,
+                            Quantity = viewModel.Quantity,
+                            PurchaseDate = viewModel.PurchaseDate,
+                            TotalCost = viewModel.TotalCost
+                        };
+                        _context.LicencePurchases.Add(purchase);
+
+                        var admin = new Models.User
+                        {
+                            CompanyId = company.CompanyId,
+                            Username = viewModel.AdminEmail,
+                            Password = GenerateUserPassword(),
+                        };
+                        _context.Users.Add(admin);
+
+                        for (var i = 0; i < viewModel.Quantity - 1; i++)
+                        {
+                            var user = new Models.User
+                            {
+                                CompanyId = company.CompanyId,
+                                Username = await GenerateUsername(company.CompanyName),
+                                Password = GenerateUserPassword(),
+                            };
+                            _context.Users.Add(user);
+
+                        }
+                        await _context.SaveChangesAsync();
+
+                        return RedirectToAction("Index");
+                    }
+                }
+                else
+                {
                     var licences = await _context.Licences
                     .Select(l => new LicenceDropDownItem
                     {
@@ -118,88 +183,23 @@ namespace ProductManager.Controllers
                         Quantity = 1,
                         PurchaseDate = DateTime.Now,
                     };
-                    return View(model);
+
+                    return View("Create", model);
                 }
-                else
-                {
-                    var company = new Models.Company
-                    {
-                        CompanyName = viewModel.CompanyName,
-                        CompanyEmail = viewModel.CompanyEmail,
-                        CompanyPhoneNumber = viewModel.CompanyPhoneNumber,
-                        AdminEmail = viewModel.AdminEmail,
-                        Payment = "Processing",
-                    };
-                    _context.Companies.Add(company);
-                    await _context.SaveChangesAsync();
 
-                    var purchase = new Models.LicencePurchase
-                    {
-                        CompanyId = company.CompanyId,
-                        LicenceId = viewModel.SelectedLicenceId,
-                        Quantity = viewModel.Quantity,
-                        PurchaseDate = viewModel.PurchaseDate,
-                        TotalCost = viewModel.TotalCost
-                    };
-                    _context.LicencePurchases.Add(purchase);
-
-                    var admin = new Models.User
-                    {
-                        CompanyId = company.CompanyId,
-                        Username = viewModel.AdminEmail,
-                        Password = GenerateUserPassword(),
-                    };
-                    _context.Users.Add(admin);
-
-                    for (var i = 0; i < viewModel.Quantity - 1; i++)
-                    {
-                        var user = new Models.User
-                        {
-                            CompanyId = company.CompanyId,
-                            Username = await GenerateUsername(company.CompanyName),
-                            Password = GenerateUserPassword(),
-                        };
-                        _context.Users.Add(user);
-
-                    }
-                    await _context.SaveChangesAsync();
-
-                    return RedirectToAction("Index");
-                }
             }
-            else
+            catch (DbUpdateException ex)
             {
-                var licences = await _context.Licences
-                .Select(l => new LicenceDropDownItem
-                {
-                    Value = l.LicenceId.ToString(),
-                    Text = l.Name,
-                    Cost = l.Cost.ToString()
-                }).ToListAsync();
+                // Log the exception details
+                Console.WriteLine($"DbUpdateException: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
 
-                var model = new CompanyDetailsViewModel
-                {
-                    Licences = licences,
-                    Quantity = 1,
-                    PurchaseDate = DateTime.Now,
-                };
-
-                return View("Create", model);
+                // Optionally, log additional details
+                // Log the SQL statement causing the exception
+                Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+                ModelState.AddModelError("", "An error occurred while saving data to the database.");
+                return View();
             }
-
-            //}
-            //catch (DbUpdateException ex)
-            //{
-            //    // Log the exception details
-            //    Console.WriteLine($"DbUpdateException: {ex.Message}");
-            //    Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
-
-            //    // Optionally, log additional details
-            //    // Log the SQL statement causing the exception
-            //    Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
-            //    ModelState.AddModelError("", "An error occurred while saving data to the database.");
-            //    return View();
-            //}
         }
 
         [HttpGet]
