@@ -271,36 +271,7 @@ namespace ProductManager.Controllers
                 {
                     var previousPurchase = await _context.LicencePurchases
                         .Where(p => p.CompanyId == viewModel.CompanyId)
-                        .FirstOrDefaultAsync();
-
-                    // Check if the data sent is similar to the data sent to the view initially
-                    if (previousPurchase.Quantity == viewModel.Quantity && previousPurchase.LicenceId == viewModel.SelectedLicenceId) 
-                    {
-                        var newLicences = await _context.Licences
-                                .Select(l => new LicenceDropDownItem
-                                {
-                                    Value = l.LicenceId.ToString(),
-                                    Text = l.Name,
-                                    Cost = l.Cost.ToString()
-                                }).ToListAsync();
-
-                        var newModel = new CompanyDetailsViewModel
-                        {
-                            CompanyId = viewModel.CompanyId,
-                            CompanyName = viewModel.CompanyName,
-                            CompanyPhoneNumber = viewModel.CompanyPhoneNumber,
-                            CompanyEmail = viewModel.CompanyEmail,
-                            SelectedLicenceId = viewModel.SelectedLicenceId,
-                            AdminEmail = viewModel.AdminEmail,
-                            Licences = newLicences,
-                            Quantity = previousPurchase.Quantity,
-                            TotalCost = previousPurchase.TotalCost,
-                            PurchaseDate = previousPurchase.PurchaseDate,
-                        };
-
-                        ModelState.AddModelError("", "The data has not been modified");
-                        return View(newModel);
-                    }
+                        .FirstOrDefaultAsync();             
 
                     if (previousPurchase == null)
                     {
@@ -327,38 +298,16 @@ namespace ProductManager.Controllers
                     }
                     else
                     {
-                        // In the event that the Quantity has been increased
-                        var newUsers = viewModel.Quantity - previousPurchase.Quantity;
-
-                        // These properties will be updated
-                        previousPurchase.LicenceId = viewModel.SelectedLicenceId;
-                        previousPurchase.Quantity = viewModel.Quantity;
-                        previousPurchase.PurchaseDate = DateTime.Now;
-                        previousPurchase.TotalCost = viewModel.TotalCost;
-                        _context.Entry(previousPurchase).State = EntityState.Modified; 
-
-                        if (newUsers > 0)
-                        {
-                            for (var i = 0; i < newUsers; i++)
-                            {
-                                var user = new Models.User
-                                {
-                                    CompanyId = viewModel.CompanyId,
-                                    Username = await GenerateUsername(viewModel.CompanyName),
-                                    Password = GenerateUserPassword(),
-                                };
-                                _context.Users.Add(user);
-                            }
-                        }
-                        else if (newUsers < 0)
+                        // Check if the data sent is similar to the data sent to the view initially
+                        if (previousPurchase.Quantity == viewModel.Quantity && previousPurchase.LicenceId == viewModel.SelectedLicenceId)
                         {
                             var newLicences = await _context.Licences
-                                .Select(l => new LicenceDropDownItem
-                                {
-                                    Value = l.LicenceId.ToString(),
-                                    Text = l.Name,
-                                    Cost = l.Cost.ToString()
-                                }).ToListAsync();
+                                    .Select(l => new LicenceDropDownItem
+                                    {
+                                        Value = l.LicenceId.ToString(),
+                                        Text = l.Name,
+                                        Cost = l.Cost.ToString()
+                                    }).ToListAsync();
 
                             var newModel = new CompanyDetailsViewModel
                             {
@@ -374,9 +323,62 @@ namespace ProductManager.Controllers
                                 PurchaseDate = previousPurchase.PurchaseDate,
                             };
 
-                            ModelState.AddModelError("", "The quantity of users cannot be decreased from this view");
+                            ModelState.AddModelError("", "The data has not been modified");
                             return View(newModel);
-                        }  
+                        }
+                        else
+                        {
+                            // In the event that the Quantity has been increased
+                            var newUsers = viewModel.Quantity - previousPurchase.Quantity;
+
+                            // These properties will be updated
+                            previousPurchase.LicenceId = viewModel.SelectedLicenceId;
+                            previousPurchase.Quantity = viewModel.Quantity;
+                            previousPurchase.PurchaseDate = DateTime.Now;
+                            previousPurchase.TotalCost = viewModel.TotalCost;
+                            _context.Entry(previousPurchase).State = EntityState.Modified;
+
+                            if (newUsers > 0)
+                            {
+                                for (var i = 0; i < newUsers; i++)
+                                {
+                                    var user = new Models.User
+                                    {
+                                        CompanyId = viewModel.CompanyId,
+                                        Username = await GenerateUsername(viewModel.CompanyName),
+                                        Password = GenerateUserPassword(),
+                                    };
+                                    _context.Users.Add(user);
+                                }
+                            }
+                            else if (newUsers < 0)
+                            {
+                                var newLicences = await _context.Licences
+                                    .Select(l => new LicenceDropDownItem
+                                    {
+                                        Value = l.LicenceId.ToString(),
+                                        Text = l.Name,
+                                        Cost = l.Cost.ToString()
+                                    }).ToListAsync();
+
+                                var newModel = new CompanyDetailsViewModel
+                                {
+                                    CompanyId = viewModel.CompanyId,
+                                    CompanyName = viewModel.CompanyName,
+                                    CompanyPhoneNumber = viewModel.CompanyPhoneNumber,
+                                    CompanyEmail = viewModel.CompanyEmail,
+                                    SelectedLicenceId = viewModel.SelectedLicenceId,
+                                    AdminEmail = viewModel.AdminEmail,
+                                    Licences = newLicences,
+                                    Quantity = previousPurchase.Quantity,
+                                    TotalCost = previousPurchase.TotalCost,
+                                    PurchaseDate = previousPurchase.PurchaseDate,
+                                };
+
+                                ModelState.AddModelError("", "The quantity of users cannot be decreased from this view");
+                                return View(newModel);
+                            }
+                        }      
                     }
                     await _context.SaveChangesAsync();
                     return RedirectToAction("Index");
