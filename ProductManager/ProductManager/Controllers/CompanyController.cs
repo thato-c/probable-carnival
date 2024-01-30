@@ -98,13 +98,10 @@ namespace ProductManager.Controllers
                     var existingCompany = await _context.Companies.FirstOrDefaultAsync(c =>
                         c.CompanyName == viewModel.CompanyName ||
                         c.CompanyEmail == viewModel.CompanyEmail ||
+                        c.AdminEmail == viewModel.AdminEmail ||
                         c.CompanyPhoneNumber == viewModel.CompanyPhoneNumber);
 
-                    var existingAdmin = await _context.Users.FirstOrDefaultAsync(u =>
-                        u.Username == viewModel.AdminEmail
-                    );
-
-                    if (existingCompany != null || existingAdmin != null)
+                    if (existingCompany != null)
                     {
                         ModelState.AddModelError("", "Company with the same details already exists.");
                         var licences = await _context.Licences
@@ -226,9 +223,7 @@ namespace ProductManager.Controllers
                         SelectedLicenceId = c.LicencePurchases
                             .Select(p => p.LicenceId)
                             .FirstOrDefault(),
-                        AdminEmail = c.Users
-                            .Select(u => u.Username)
-                            .FirstOrDefault() ?? "",
+                        AdminEmail = c.AdminEmail,
                         Licences = licences,
                         Quantity = c.LicencePurchases.Sum(purchase => (int?)purchase.Quantity) ?? 0,
                         TotalCost = c.LicencePurchases.Sum(purchase => (decimal?)purchase.TotalCost) ?? 0,
@@ -287,13 +282,36 @@ namespace ProductManager.Controllers
 
                         for (var i = 0; i < viewModel.Quantity; i++)
                         {
-                            var user = new Models.User
+                            if (i == 0)
                             {
-                                CompanyId = viewModel.CompanyId,
-                                Username = await GenerateUsername(viewModel.CompanyName),
-                                Password = GenerateUserPassword(),
-                            };
-                            _context.Users.Add(user);
+                                var adminEmail = await _context.Companies
+                                    .Where(c => c.CompanyId == viewModel.CompanyId)
+                                    .Select(c => c.AdminEmail) 
+                                    .FirstOrDefaultAsync();
+
+                                if (adminEmail != null)
+                                {
+                                    var Admin = new Models.User
+                                    {
+                                        CompanyId = viewModel.CompanyId,
+                                        Username = adminEmail,
+                                        Password = GenerateUserPassword(),
+
+                                    };
+                                    _context.Users.Add(Admin);
+                                }
+                            }
+                            else
+                            {
+                                var user = new Models.User
+                                {
+                                    CompanyId = viewModel.CompanyId,
+                                    Username = await GenerateUsername(viewModel.CompanyName),
+                                    Password = GenerateUserPassword(),
+                                };
+                                _context.Users.Add(user);
+                            }
+                            
                         }
                     }
                     else

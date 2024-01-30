@@ -44,7 +44,7 @@ namespace ProductManager.Controllers
                     {
                         // Create a list to hold the claims
                         var claims = new List<Claim>();
-                        
+
                         // Add a ClaimType for username
                         var username = user.Username;
                         claims.Add(new Claim(ClaimTypes.Name, username.ToString()));
@@ -140,7 +140,7 @@ namespace ProductManager.Controllers
                 ModelState.AddModelError("", "An error occurred while retrieving data from the database.");
                 return View("Index", model);
             }
-            
+
         }
 
         [HttpPost]
@@ -161,80 +161,58 @@ namespace ProductManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegistrationViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // Check if the Company already exists
-                var existingCompany = await _context.Companies.FirstOrDefaultAsync(c =>
-                    c.CompanyName == model.CompanyName ||
-                    c.CompanyEmail == model.CompanyEmail ||
-                    c.CompanyPhoneNumber == model.CompanyPhoneNumber);
-
-                var existingAdmin = await _context.Users.FirstOrDefaultAsync(c =>
-                    c.Username == model.AdminEmail);
-
-                if (existingCompany != null || existingAdmin != null)
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("", "Company already exists");
-                    return View(model);
-                }
-                else
-                {
-                    // Map the viewModel to the Company entity
-                    var Company = new Models.Company
-                    {
-                        CompanyName = model.CompanyName,
-                        CompanyEmail = model.CompanyEmail,
-                        CompanyPhoneNumber = model.CompanyPhoneNumber,
-                    };
+                    // Check if the Company already exists
+                    var existingCompany = await _context.Companies.FirstOrDefaultAsync(c =>
+                        c.CompanyName == model.CompanyName ||
+                        c.CompanyEmail == model.CompanyEmail ||
+                        c.AdminEmail == model.AdminEmail ||
+                        c.CompanyPhoneNumber == model.CompanyPhoneNumber);
 
-                    try
+                    if (existingCompany != null)
                     {
+                        ModelState.AddModelError("", "Company already exists");
+                        return View(model);
+                    }
+                    else
+                    {
+                        // Map the viewModel to the Company entity
+                        var Company = new Models.Company
+                        {
+                            CompanyName = model.CompanyName,
+                            CompanyEmail = model.CompanyEmail,
+                            CompanyPhoneNumber = model.CompanyPhoneNumber,
+                            AdminEmail = model.AdminEmail,
+                            Payment = "Unpaid",
+                        };
                         _context.Companies.Add(Company);
-                        _context.SaveChanges();
-
-                        var password = GenerateUserPassword();
-                        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-
-                        var Admin = new Models.User
-                        {
-                            CompanyId = Company.CompanyId,
-                            Username = model.AdminEmail,
-                            Password = hashedPassword,
-                        };
-
-                        _context.Users.Add(Admin);
-                        _context.SaveChanges();
-
-                        var userRole = new Models.UserRole
-                        {
-                            UserId = Admin.UserId,
-                            RoleId = 4,
-                        };
-
-                        _context.UserRoles.Add(userRole);
                         _context.SaveChanges();
 
                         return RedirectToAction("RegistrationSuccess");
                     }
-                    catch (DbUpdateException ex)
-                    {
-                        // Log the exception details
-                        Console.WriteLine($"DbUpdateException: {ex.Message}");
-                        Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
-
-                        // Optionally, log additional details
-                        // Log the SQL statement causing the exception
-                        Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
-
-                        ModelState.AddModelError("", "An error occurred while saving data to the database.");
-                        return View(model);
-                    }  
+                }
+                else
+                {
+                    return View(model);
                 }
             }
-            else
+            catch (DbUpdateException ex)
             {
+                // Log the exception details
+                Console.WriteLine($"DbUpdateException: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+
+                // Optionally, log additional details
+                // Log the SQL statement causing the exception
+                Console.WriteLine($"SQL: {ex.InnerException?.InnerException?.Message}");
+
+                ModelState.AddModelError("", "An error occurred while saving data to the database.");
                 return View(model);
             }
+
         }
 
         [HttpGet]
