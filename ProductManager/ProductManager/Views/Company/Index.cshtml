@@ -9,6 +9,16 @@
 <br />
 <br />
 
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Search: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> | 
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
+
 @if (Model != null)
 {
     <table class="table">
@@ -21,6 +31,9 @@
             </th>
             <th>
                 Email
+            </th>
+            <th>
+                Admin
             </th>
             <th>
                 <a asp-action="Index" asp-route-sortOrder="@ViewData["PaymentSortParm"]"> Payment Status</a>  
@@ -44,6 +57,9 @@
                     </td>
                     <td>
                         @company.CompanyEmail
+                    </td>
+                    <td>
+                        @company.AdminEmail
                     </td>
                     <td>
                         @company.PaymentStatus

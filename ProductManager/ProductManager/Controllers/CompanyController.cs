@@ -18,18 +18,27 @@ namespace ProductManager.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
             try
             {
                 ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
                 ViewData["PaymentSortParm"] = sortOrder == "payment" ? "payment_desc" : "payment";
+                ViewData["CurrentFilter"] = searchString;
                 var companies = await _context.Companies.AsNoTracking().ToListAsync();
 
                 if (companies.Count == 0)
                 {
                     ViewBag.Message = "No Companies have Registered";
                     return View();
+                }
+
+                if (!String.IsNullOrEmpty(searchString))
+                {
+                    companies = companies.Where(c => c.CompanyName.Contains(searchString) ||
+                    c.CompanyEmail.Contains(searchString) ||
+                    c.AdminEmail.Contains(searchString)
+                    ).ToList();
                 }
 
                 switch (sortOrder)
