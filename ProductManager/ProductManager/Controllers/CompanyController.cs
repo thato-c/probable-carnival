@@ -21,8 +21,7 @@ namespace ProductManager.Controllers
         public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? pageNumber)
         {
             try
-            {
-                
+            { 
                 ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
                 ViewData["PaymentSortParm"] = sortOrder == "payment" ? "payment_desc" : "payment";
                 ViewData["CurrentSort"] = sortOrder;
