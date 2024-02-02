@@ -49,5 +49,8 @@ namespace ProductManager.ViewModels
         [Column(TypeName = "decimal(10, 2)")]
         [Range(0, double.MaxValue, ErrorMessage = "Total Cost must be a non-negative value")]
         public decimal TotalCost { get; set; }
+
+        [Timestamp]
+        public byte RowVersion { get; set; }
     }
 }

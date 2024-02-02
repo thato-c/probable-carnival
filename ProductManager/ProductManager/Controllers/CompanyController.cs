@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
+using ProductManager.Interfaces;
 using ProductManager.Models;
 using ProductManager.ViewModels;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -18,18 +19,59 @@ namespace ProductManager.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? pageNumber)
         {
             try
-            {
-                var companies = await _context.Companies.ToListAsync();
+            { 
+                ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+                ViewData["PaymentSortParm"] = sortOrder == "payment" ? "payment_desc" : "payment";
+                ViewData["CurrentSort"] = sortOrder;
+                if (searchString != null)
+                {
+                    pageNumber = 1;
+                }
+                else
+                {
+                    searchString = currentFilter;
+                }
+                ViewData["CurrentFilter"] = searchString;
 
-                if (companies.Count == 0)
+                // GetAll Companies
+                var companies = from c in _context.Companies select c;
+
+                if (!companies.Any())
                 {
                     ViewBag.Message = "No Companies have Registered";
                     return View();
                 }
-                return View(companies);
+
+                if (!String.IsNullOrEmpty(searchString))
+                {
+                    companies = companies.Where(c => c.CompanyName.Contains(searchString) ||
+                    c.CompanyEmail.Contains(searchString) ||
+                    c.AdminEmail.Contains(searchString)
+                    );
+                }
+
+                switch (sortOrder)
+                {
+                    case "name_desc":
+                        companies = companies.OrderByDescending(d => d.CompanyName);
+                        break;  
+                    case "payment_desc":
+                        companies = companies.OrderByDescending(d => d.PaymentStatus);
+                        break;
+                    case "payment":
+                        companies = companies.OrderBy(d => d.PaymentStatus);
+                        break;
+
+                    default:
+                        companies = companies.OrderBy(d => d.CompanyName); 
+                        break;
+                }
+
+                int pageSize = 10;
+                return View(await PaginatedList<Company>.CreateAsync(companies.AsNoTracking(), pageNumber ?? 1, pageSize));
             }
             catch (DbUpdateException ex)
             {
@@ -52,6 +94,7 @@ namespace ProductManager.Controllers
         {
             try
             {
+                // GetAll Licences
                 var licences = await _context.Licences
                 .Select(l => new LicenceDropDownItem
                 {
@@ -68,7 +111,7 @@ namespace ProductManager.Controllers
                 };
 
                 return View(viewModel);
-            } 
+            }
             catch (DbUpdateException ex)
             {
                 // Log the exception details
@@ -81,7 +124,7 @@ namespace ProductManager.Controllers
                 ModelState.AddModelError("", "An error occurred while retrieving data from the database.");
                 return View();
             }
-            
+
         }
 
         [HttpPost]
@@ -95,18 +138,18 @@ namespace ProductManager.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    // GetByName,Email,AdminEmail,PhoneNumber Company
                     var existingCompany = await _context.Companies.FirstOrDefaultAsync(c =>
                         c.CompanyName == viewModel.CompanyName ||
                         c.CompanyEmail == viewModel.CompanyEmail ||
+                        c.AdminEmail == viewModel.AdminEmail ||
                         c.CompanyPhoneNumber == viewModel.CompanyPhoneNumber);
 
-                    var existingAdmin = await _context.Users.FirstOrDefaultAsync(u =>
-                        u.Username == viewModel.AdminEmail
-                    );
-
-                    if (existingCompany != null || existingAdmin != null)
+                    if (existingCompany != null)
                     {
                         ModelState.AddModelError("", "Company with the same details already exists.");
+
+                        // GetAll Licences
                         var licences = await _context.Licences
                         .Select(l => new LicenceDropDownItem
                         {
@@ -130,7 +173,11 @@ namespace ProductManager.Controllers
                             CompanyName = viewModel.CompanyName,
                             CompanyEmail = viewModel.CompanyEmail,
                             CompanyPhoneNumber = viewModel.CompanyPhoneNumber,
+                            AdminEmail = viewModel.AdminEmail,
+                            PaymentStatus = PaymentStatus.Processing,
                         };
+
+                        // Add Company
                         _context.Companies.Add(company);
                         await _context.SaveChangesAsync();
 
@@ -142,6 +189,8 @@ namespace ProductManager.Controllers
                             PurchaseDate = viewModel.PurchaseDate,
                             TotalCost = viewModel.TotalCost
                         };
+
+                        // Purchase
                         _context.LicencePurchases.Add(purchase);
 
                         var admin = new Models.User
@@ -150,7 +199,16 @@ namespace ProductManager.Controllers
                             Username = viewModel.AdminEmail,
                             Password = GenerateUserPassword(),
                         };
+                        // Add User
                         _context.Users.Add(admin);
+                        await _context.SaveChangesAsync();
+
+                        var adminRole = new Models.UserRole
+                        {
+                            UserId = admin.UserId,
+                            RoleId = 4,
+                        };
+                        _context.UserRoles.Add(adminRole);
 
                         for (var i = 0; i < viewModel.Quantity - 1; i++)
                         {
@@ -160,12 +218,14 @@ namespace ProductManager.Controllers
                                 Username = await GenerateUsername(company.CompanyName),
                                 Password = GenerateUserPassword(),
                             };
+
+                            // Add User
                             _context.Users.Add(user);
                         }
                         await _context.SaveChangesAsync();
 
                         return RedirectToAction("Index");
-                    }   
+                    }
                 }
                 else
                 {
@@ -186,8 +246,8 @@ namespace ProductManager.Controllers
 
                     return View("Create", model);
                 }
-               
-            } 
+
+            }
             catch (DbUpdateException ex)
             {
                 // Log the exception details
@@ -207,6 +267,7 @@ namespace ProductManager.Controllers
         {
             try
             {
+                // GetAll Licences
                 var licences = await _context.Licences
                         .Select(l => new LicenceDropDownItem
                         {
@@ -215,6 +276,7 @@ namespace ProductManager.Controllers
                             Cost = l.Cost.ToString()
                         }).ToListAsync();
 
+                // GetById Company
                 var registeredCompany = await _context.Companies
                     .Where(c => c.CompanyId == CompanyId)
                     .Select(c => new CompanyDetailsViewModel
@@ -226,9 +288,7 @@ namespace ProductManager.Controllers
                         SelectedLicenceId = c.LicencePurchases
                             .Select(p => p.LicenceId)
                             .FirstOrDefault(),
-                        AdminEmail = c.Users
-                            .Select(u => u.Username)
-                            .FirstOrDefault() ?? "",
+                        AdminEmail = c.AdminEmail,
                         Licences = licences,
                         Quantity = c.LicencePurchases.Sum(purchase => (int?)purchase.Quantity) ?? 0,
                         TotalCost = c.LicencePurchases.Sum(purchase => (decimal?)purchase.TotalCost) ?? 0,
@@ -258,7 +318,6 @@ namespace ProductManager.Controllers
                 ModelState.AddModelError("", "An error occurred while retrieving data from the database.");
                 return View();
             }
-            
         }
 
         [HttpPost]
@@ -269,9 +328,10 @@ namespace ProductManager.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    // GetByCompanyId Purchase
                     var previousPurchase = await _context.LicencePurchases
                         .Where(p => p.CompanyId == viewModel.CompanyId)
-                        .FirstOrDefaultAsync();             
+                        .FirstOrDefaultAsync();
 
                     if (previousPurchase == null)
                     {
@@ -283,17 +343,51 @@ namespace ProductManager.Controllers
                             PurchaseDate = viewModel.PurchaseDate,
                             TotalCost = viewModel.TotalCost
                         };
+                        // Add Purchase
                         _context.LicencePurchases.Add(purchase);
 
                         for (var i = 0; i < viewModel.Quantity; i++)
                         {
-                            var user = new Models.User
+                            if (i == 0)
                             {
-                                CompanyId = viewModel.CompanyId,
-                                Username = await GenerateUsername(viewModel.CompanyName),
-                                Password = GenerateUserPassword(),
-                            };
-                            _context.Users.Add(user);
+                                // GetAdminByCompanyId Company
+                                var adminEmail = await _context.Companies
+                                    .Where(c => c.CompanyId == viewModel.CompanyId)
+                                    .Select(c => c.AdminEmail)
+                                    .FirstOrDefaultAsync();
+
+                                if (adminEmail != null)
+                                {
+                                    var admin = new Models.User
+                                    {
+                                        CompanyId = viewModel.CompanyId,
+                                        Username = adminEmail,
+                                        Password = GenerateUserPassword(),
+
+                                    };
+                                    // User Add
+                                    _context.Users.Add(admin);
+                                    await _context.SaveChangesAsync();
+
+                                    var adminRole = new Models.UserRole
+                                    {
+                                        UserId = admin.UserId,
+                                        RoleId = 4,
+                                    };
+                                    _context.UserRoles.Add(adminRole);
+                                }
+                            }
+                            else
+                            {
+                                var user = new Models.User
+                                {
+                                    CompanyId = viewModel.CompanyId,
+                                    Username = await GenerateUsername(viewModel.CompanyName),
+                                    Password = GenerateUserPassword(),
+                                };
+                                _context.Users.Add(user);
+                            }
+
                         }
                     }
                     else
@@ -336,6 +430,8 @@ namespace ProductManager.Controllers
                             previousPurchase.Quantity = viewModel.Quantity;
                             previousPurchase.PurchaseDate = DateTime.Now;
                             previousPurchase.TotalCost = viewModel.TotalCost;
+
+                            // Update Purchase
                             _context.Entry(previousPurchase).State = EntityState.Modified;
 
                             if (newUsers > 0)
@@ -348,11 +444,13 @@ namespace ProductManager.Controllers
                                         Username = await GenerateUsername(viewModel.CompanyName),
                                         Password = GenerateUserPassword(),
                                     };
+                                    // Add User
                                     _context.Users.Add(user);
                                 }
                             }
                             else if (newUsers < 0)
                             {
+                                // GetAll Licence
                                 var newLicences = await _context.Licences
                                     .Select(l => new LicenceDropDownItem
                                     {
@@ -378,7 +476,7 @@ namespace ProductManager.Controllers
                                 ModelState.AddModelError("", "The quantity of users cannot be decreased from this view");
                                 return View(newModel);
                             }
-                        }      
+                        }
                     }
                     await _context.SaveChangesAsync();
                     return RedirectToAction("Index");

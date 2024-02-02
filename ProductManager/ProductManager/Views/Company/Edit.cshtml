@@ -9,6 +9,7 @@
     @Html.AntiForgeryToken()
     <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="CompanyId" />
+    <input type="hidden" asp-for="RowVersion" />
 
     <div class="form-group">
         <label asp-for="CompanyName">Company Name</label>

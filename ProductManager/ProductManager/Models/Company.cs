@@ -19,13 +19,25 @@ namespace ProductManager.Models
         [EmailAddress]
         public string CompanyEmail { get; set; } = string.Empty;
 
-        // TODO: Add Payment Status field
-        // TODO: Add Admin Email field
-        // TODO: Add RowVersion
+        public PaymentStatus PaymentStatus { get; set; }
+
+        [Required(ErrorMessage = "Admin Email is required")]
+        [EmailAddress]
+        public string AdminEmail { get; set; }
+
+        [Timestamp]
+        public byte RowVersion { get; set; }
 
         public ICollection<LicencePurchase> LicencePurchases { get; set; }
         public ICollection<User> Users { get; set; }
 
         public ICollection<Project> Projects { get; set; }
+    }
+
+    public enum PaymentStatus
+    {
+        Unpaid,
+        Processing,
+        Paid,
     }
 }
