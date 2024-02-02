@@ -39,8 +39,6 @@ namespace ProductManager.Controllers
                     var user = await _context.Users
                         .Include(u => u.UserProjectAssignments)
                         .Include(u => u.Company)
-                        .Include(u => u.UserRoles)
-                            .ThenInclude(ur => ur.Role)
                         .FirstOrDefaultAsync(u => u.Username == model.Username);
 
                     if (user != null && BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
@@ -54,7 +52,9 @@ namespace ProductManager.Controllers
                         claims.Add(new Claim(ClaimTypes.Name, username.ToString()));
                         claims.Add(new Claim("CompanyName", companyName.ToString()));
 
-                        var userRole = await _context.UserRoles.FirstOrDefaultAsync(u => u.UserId == user.UserId);
+                        var userRole = await _context.UserRoles
+                            .Include(ur => ur.Role)
+                            .FirstOrDefaultAsync(u => u.UserId == user.UserId);
 
                         // When the user is a Company Admin
                         if (userRole != null && userRole.Role != null && userRole.Role.Name == "Company Administrator")
