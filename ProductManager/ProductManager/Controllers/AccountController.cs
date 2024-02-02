@@ -12,11 +12,11 @@ using System.Security.Claims;
 namespace ProductManager.Controllers
 {
     [AllowAnonymous]
-    public class LoginController : Controller
+    public class AccountController : Controller
     {
         public readonly ApplicationDBContext _context;
 
-        public LoginController(ApplicationDBContext context)
+        public AccountController(ApplicationDBContext context)
         {
             _context = context;
         }
