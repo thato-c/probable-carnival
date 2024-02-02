@@ -358,7 +358,7 @@ namespace ProductManager.Controllers
 
                                 if (adminEmail != null)
                                 {
-                                    var Admin = new Models.User
+                                    var admin = new Models.User
                                     {
                                         CompanyId = viewModel.CompanyId,
                                         Username = adminEmail,
@@ -366,7 +366,15 @@ namespace ProductManager.Controllers
 
                                     };
                                     // User Add
-                                    _context.Users.Add(Admin);
+                                    _context.Users.Add(admin);
+                                    await _context.SaveChangesAsync();
+
+                                    var adminRole = new Models.UserRole
+                                    {
+                                        UserId = admin.UserId,
+                                        RoleId = 4,
+                                    };
+                                    _context.UserRoles.Add(adminRole);
                                 }
                             }
                             else
