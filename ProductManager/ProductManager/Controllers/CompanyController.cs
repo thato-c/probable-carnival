@@ -201,6 +201,14 @@ namespace ProductManager.Controllers
                         };
                         // Add User
                         _context.Users.Add(admin);
+                        await _context.SaveChangesAsync();
+
+                        var adminRole = new Models.UserRole
+                        {
+                            UserId = admin.UserId,
+                            RoleId = 4,
+                        };
+                        _context.UserRoles.Add(adminRole);
 
                         for (var i = 0; i < viewModel.Quantity - 1; i++)
                         {
@@ -213,7 +221,6 @@ namespace ProductManager.Controllers
 
                             // Add User
                             _context.Users.Add(user);
-
                         }
                         await _context.SaveChangesAsync();
 
