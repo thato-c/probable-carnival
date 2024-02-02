@@ -73,20 +73,16 @@ namespace ProductManager.Controllers
                         }
                         else if (userRole != null && userRole.Role != null && userRole.Role.Name == "User")
                         {
-                            if (user.UserProjectAssignments != null && user.UserProjectAssignments.Any())
-                            {
-                                // User has projects assigned, redirect to a page related to their project.
-                                var projectName = await (
-                                    from project in _context.Projects
-                                    join assignment in _context.UserProjectsAssignments on project.ProjectId equals assignment.ProjectId
-                                    where assignment.UserId == user.UserId
-                                    select project.Name
-                                ).FirstOrDefaultAsync();
+                            var userProject = await _context.UserProjectsAssignments
+                                .Include(u => u.Project)
+                                .FirstOrDefaultAsync(u => u.UserId == user.UserId);
 
+                            if (userProject != null)
+                            {
                                 if (userRole != null && userRole.Role.Name != null)
                                 {
                                     claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
-                                    claims.Add(new Claim("ProjectName", projectName.ToString()));
+                                    claims.Add(new Claim("ProjectName", userProject.Project.Name.ToString()));
 
                                     // Create a ClaimsIdentity and attach the claims to it.
                                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -98,9 +94,6 @@ namespace ProductManager.Controllers
                                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
                                 };
 
-                                var projectId = user.UserProjectAssignments.First().ProjectId;
-
-                                //return RedirectToAction("ProjectDetails", "Projects", new { projectId });
                                 return RedirectToAction("Index", "Home");
                             }
                             else
