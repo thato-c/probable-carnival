@@ -13,11 +13,9 @@ namespace ProductManager.Controllers
     {
         private readonly ApplicationDBContext _context;
 
-        private readonly ICompanyRepository _companyRepository;
-
-        public CompanyController(ICompanyRepository companyRepository)
+        public CompanyController(ApplicationDBContext context)
         {
-            _companyRepository = companyRepository;
+            _context = context;
         }
 
         [HttpGet]
