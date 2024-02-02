@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
+using ProductManager.Interfaces;
 using ProductManager.Models;
 using ProductManager.ViewModels;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -12,9 +13,11 @@ namespace ProductManager.Controllers
     {
         private readonly ApplicationDBContext _context;
 
-        public CompanyController(ApplicationDBContext context)
+        private readonly ICompanyRepository _companyRepository;
+
+        public CompanyController(ICompanyRepository companyRepository)
         {
-            _context = context;
+            _companyRepository = companyRepository;
         }
 
         [HttpGet]
@@ -34,6 +37,8 @@ namespace ProductManager.Controllers
                     searchString = currentFilter;
                 }
                 ViewData["CurrentFilter"] = searchString;
+
+                // GetAll Companies
                 var companies = from c in _context.Companies select c;
 
                 if (!companies.Any())
@@ -91,6 +96,7 @@ namespace ProductManager.Controllers
         {
             try
             {
+                // GetAll Licences
                 var licences = await _context.Licences
                 .Select(l => new LicenceDropDownItem
                 {
@@ -134,6 +140,7 @@ namespace ProductManager.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    // GetByName,Email,AdminEmail,PhoneNumber Company
                     var existingCompany = await _context.Companies.FirstOrDefaultAsync(c =>
                         c.CompanyName == viewModel.CompanyName ||
                         c.CompanyEmail == viewModel.CompanyEmail ||
@@ -143,6 +150,8 @@ namespace ProductManager.Controllers
                     if (existingCompany != null)
                     {
                         ModelState.AddModelError("", "Company with the same details already exists.");
+
+                        // GetAll Licences
                         var licences = await _context.Licences
                         .Select(l => new LicenceDropDownItem
                         {
@@ -169,6 +178,8 @@ namespace ProductManager.Controllers
                             AdminEmail = viewModel.AdminEmail,
                             PaymentStatus = PaymentStatus.Processing,
                         };
+
+                        // Add Company
                         _context.Companies.Add(company);
                         await _context.SaveChangesAsync();
 
@@ -180,6 +191,8 @@ namespace ProductManager.Controllers
                             PurchaseDate = viewModel.PurchaseDate,
                             TotalCost = viewModel.TotalCost
                         };
+
+                        // Purchase
                         _context.LicencePurchases.Add(purchase);
 
                         var admin = new Models.User
@@ -188,6 +201,7 @@ namespace ProductManager.Controllers
                             Username = viewModel.AdminEmail,
                             Password = GenerateUserPassword(),
                         };
+                        // Add User
                         _context.Users.Add(admin);
 
                         for (var i = 0; i < viewModel.Quantity - 1; i++)
@@ -198,6 +212,8 @@ namespace ProductManager.Controllers
                                 Username = await GenerateUsername(company.CompanyName),
                                 Password = GenerateUserPassword(),
                             };
+
+                            // Add User
                             _context.Users.Add(user);
 
                         }
@@ -246,6 +262,7 @@ namespace ProductManager.Controllers
         {
             try
             {
+                // GetAll Licences
                 var licences = await _context.Licences
                         .Select(l => new LicenceDropDownItem
                         {
@@ -254,6 +271,7 @@ namespace ProductManager.Controllers
                             Cost = l.Cost.ToString()
                         }).ToListAsync();
 
+                // GetById Company
                 var registeredCompany = await _context.Companies
                     .Where(c => c.CompanyId == CompanyId)
                     .Select(c => new CompanyDetailsViewModel
@@ -305,6 +323,7 @@ namespace ProductManager.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    // GetByCompanyId Purchase
                     var previousPurchase = await _context.LicencePurchases
                         .Where(p => p.CompanyId == viewModel.CompanyId)
                         .FirstOrDefaultAsync();
@@ -319,12 +338,14 @@ namespace ProductManager.Controllers
                             PurchaseDate = viewModel.PurchaseDate,
                             TotalCost = viewModel.TotalCost
                         };
+                        // Add Purchase
                         _context.LicencePurchases.Add(purchase);
 
                         for (var i = 0; i < viewModel.Quantity; i++)
                         {
                             if (i == 0)
                             {
+                                // GetAdminByCompanyId Company
                                 var adminEmail = await _context.Companies
                                     .Where(c => c.CompanyId == viewModel.CompanyId)
                                     .Select(c => c.AdminEmail)
@@ -339,6 +360,7 @@ namespace ProductManager.Controllers
                                         Password = GenerateUserPassword(),
 
                                     };
+                                    // User Add
                                     _context.Users.Add(Admin);
                                 }
                             }
@@ -395,6 +417,8 @@ namespace ProductManager.Controllers
                             previousPurchase.Quantity = viewModel.Quantity;
                             previousPurchase.PurchaseDate = DateTime.Now;
                             previousPurchase.TotalCost = viewModel.TotalCost;
+
+                            // Update Purchase
                             _context.Entry(previousPurchase).State = EntityState.Modified;
 
                             if (newUsers > 0)
@@ -407,11 +431,13 @@ namespace ProductManager.Controllers
                                         Username = await GenerateUsername(viewModel.CompanyName),
                                         Password = GenerateUserPassword(),
                                     };
+                                    // Add User
                                     _context.Users.Add(user);
                                 }
                             }
                             else if (newUsers < 0)
                             {
+                                // GetAll Licence
                                 var newLicences = await _context.Licences
                                     .Select(l => new LicenceDropDownItem
                                     {

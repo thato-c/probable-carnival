@@ -3,6 +3,8 @@ using ProductManager.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using ProductManager.Interfaces;
+using ProductManager.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +21,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/Login/Logout";
     });
 builder.Services.AddControllersWithViews(q => q.Filters.Add(new AuthorizeFilter()));
-
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
