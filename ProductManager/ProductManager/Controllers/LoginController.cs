@@ -26,6 +26,8 @@ namespace ProductManager.Controllers
             return View();
         }
 
+        //
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -36,6 +38,7 @@ namespace ProductManager.Controllers
                 {
                     var user = await _context.Users
                         .Include(u => u.UserProjectAssignments)
+                        .Include(u => u.Company)
                         .Include(u => u.UserRoles)
                             .ThenInclude(ur => ur.Role)
                         .FirstOrDefaultAsync(u => u.Username == model.Username);
@@ -47,48 +50,63 @@ namespace ProductManager.Controllers
 
                         // Add a ClaimType for username
                         var username = user.Username;
+                        var companyName = user.Company.CompanyName;
                         claims.Add(new Claim(ClaimTypes.Name, username.ToString()));
+                        claims.Add(new Claim("CompanyName", companyName.ToString()));
 
                         var userRole = await _context.UserRoles.FirstOrDefaultAsync(u => u.UserId == user.UserId);
 
-                        if (user.UserProjectAssignments != null && user.UserProjectAssignments.Any())
+                        // When the user is a Company Admin
+                        if (userRole != null && userRole.Role != null && userRole.Role.Name == "Company Administrator")
                         {
-                            // User has projects assigned, redirect to a page related to their project.
-                            var projectName = await (
-                                from project in _context.Projects
-                                join assignment in _context.UserProjectsAssignments on project.ProjectId equals assignment.ProjectId
-                                where assignment.UserId == user.UserId
-                                select project.Name
-                            ).FirstOrDefaultAsync();
+                            claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
 
-                            if (userRole != null && userRole.Role.Name != null)
-                            {
-                                claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
-                                claims.Add(new Claim("ProjectName", projectName.ToString()));
+                            // Create a ClaimsIdentity and attach the claims to it.
+                            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                                // Create a ClaimsIdentity and attach the claims to it.
-                                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                            // Create a ClaimsPrincipal with the ClaimsIdentity
+                            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-                                // Create a ClaimasPrincipal with the ClaaimsIdentity
-                                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-                                // Sign in the user with the ClaimsPrincipal
-                                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
-                            };
-
-                            var projectId = user.UserProjectAssignments.First().ProjectId;
-
-                            //return RedirectToAction("ProjectDetails", "Projects", new { projectId });
-                            return RedirectToAction("Index", "Home");
+                            // Sign in the user with the ClaimsPrincipal
+                            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+                            return RedirectToAction("Index", "Project", new { companyId = user.CompanyId });
                         }
-                        else
+                        else if (userRole != null && userRole.Role != null && userRole.Role.Name == "User")
                         {
-
-                            // User has no projects assigned
-
-                            // User has a role of User
-                            if (userRole != null && userRole.Role != null && userRole.Role.Name == "User")
+                            if (user.UserProjectAssignments != null && user.UserProjectAssignments.Any())
                             {
+                                // User has projects assigned, redirect to a page related to their project.
+                                var projectName = await (
+                                    from project in _context.Projects
+                                    join assignment in _context.UserProjectsAssignments on project.ProjectId equals assignment.ProjectId
+                                    where assignment.UserId == user.UserId
+                                    select project.Name
+                                ).FirstOrDefaultAsync();
+
+                                if (userRole != null && userRole.Role.Name != null)
+                                {
+                                    claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
+                                    claims.Add(new Claim("ProjectName", projectName.ToString()));
+
+                                    // Create a ClaimsIdentity and attach the claims to it.
+                                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                                    // Create a ClaimasPrincipal with the ClaaimsIdentity
+                                    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                                    // Sign in the user with the ClaimsPrincipal
+                                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+                                };
+
+                                var projectId = user.UserProjectAssignments.First().ProjectId;
+
+                                //return RedirectToAction("ProjectDetails", "Projects", new { projectId });
+                                return RedirectToAction("Index", "Home");
+                            }
+                            else
+                            {
+
+                                // User has no projects assigned
                                 claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
 
                                 // Create a ClaimsIdentity and attach the claims to it.
@@ -101,22 +119,7 @@ namespace ProductManager.Controllers
                                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 
                                 return View("ContactAdmin");
-                            }
 
-                            // User  has a role of Company Admin
-                            else if (userRole != null && userRole.Role != null && userRole.Role.Name == "Company Administrator")
-                            {
-                                claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
-
-                                // Create a ClaimsIdentity and attach the claims to it.
-                                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                                // Create a ClaimsPrincipal with the ClaimsIdentity
-                                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-                                // Sign in the user with the ClaimsPrincipal
-                                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
-                                return RedirectToAction("Index", "Project", new { companyId = user.CompanyId });
                             }
                         }
                     }
