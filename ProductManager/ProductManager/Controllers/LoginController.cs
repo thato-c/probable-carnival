@@ -37,7 +37,6 @@ namespace ProductManager.Controllers
                 if (ModelState.IsValid)
                 {
                     var user = await _context.Users
-                        .Include(u => u.UserProjectAssignments)
                         .Include(u => u.Company)
                         .FirstOrDefaultAsync(u => u.Username == model.Username);
 
@@ -57,7 +56,21 @@ namespace ProductManager.Controllers
                             .FirstOrDefaultAsync(u => u.UserId == user.UserId);
 
                         // When the user is a Company Admin
-                        if (userRole != null && userRole.Role != null && userRole.Role.Name == "Company Administrator")
+                        if (userRole != null && userRole.Role != null && userRole.Role.Name == "Vendor")
+                        {
+                            claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
+
+                            // Create a ClaimsIdentity and attach the claims to it.
+                            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                            // Create a ClaimsPrincipal with the ClaimsIdentity
+                            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                            // Sign in the user with the ClaimsPrincipal
+                            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+                            return RedirectToAction("Index", "Company");
+                        }
+                        else if (userRole != null && userRole.Role != null && userRole.Role.Name == "Company Administrator")
                         {
                             claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
 
