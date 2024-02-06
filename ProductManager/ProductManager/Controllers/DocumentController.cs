@@ -90,54 +90,76 @@ namespace ProductManager.Controllers
 
         public async Task<IActionResult> UploadFile(DocumentUploadViewModel viewModel)
         {
-            using (var memoryStream = new MemoryStream())
+            if (ModelState.IsValid)
             {
-                await viewModel.FileUpload.FormFile.CopyToAsync(memoryStream);
-
-                // Upload the file if less than 2MB
-                if (memoryStream.Length < 2097152)
+                using (var memoryStream = new MemoryStream())
                 {
-                    var file = new Models.Document()
+                    await viewModel.FileUpload.FormFile.CopyToAsync(memoryStream);
+
+                    // Upload the file if less than 2MB
+                    if (memoryStream.Length < 2097152)
                     {
-                        Name = "Document1",
-                        FileSize = memoryStream.Length,
-                        UploadDate = DateTime.Now,
-                        FileURL = "Database",
-                        ProjectId = viewModel.ProjectId,
-                        //Content = memoryStream.ToArray()
-                    };
-
-                    _context.Documents.Add(file);
-                    await _context.SaveChangesAsync();
-                }
-                else
-                {
-                    ModelState.AddModelError("File", "The file is too large");
-
-                    /// Get project documents
-                    var documents = _context.Documents
-                        .Where(d => d.ProjectId == viewModel.ProjectId)
-                        .Select(d => new DocumentViewModel
+                        var file = new Models.Document()
                         {
-                            Name = d.Name,
-                            FileSize = d.FileSize,
-                            UploadDate = d.UploadDate,
-                        })
-                        .ToList();
+                            Name = viewModel.DocumentName,
+                            FileSize = memoryStream.Length,
+                            UploadDate = DateTime.Now,
+                            FileURL = "Database",
+                            ProjectId = viewModel.ProjectId,
+                            //Content = memoryStream.ToArray()
+                        };
 
-                    var documentViewModel = new DocumentUploadViewModel
+                        _context.Documents.Add(file);
+                        await _context.SaveChangesAsync();
+                    }
+                    else
                     {
-                        Documents = documents,
-                        FileUpload = new BufferedSingleFileUploadDb(),
-                        ProjectId = viewModel.ProjectId,
-                    };
+                        ModelState.AddModelError("", "The file is too large");
 
-                    return View("Index", documentViewModel);
+                        /// Get project documents
+                        var documents = _context.Documents
+                            .Where(d => d.ProjectId == viewModel.ProjectId)
+                            .Select(d => new DocumentViewModel
+                            {
+                                Name = d.Name,
+                                FileSize = d.FileSize,
+                                UploadDate = d.UploadDate,
+                            })
+                            .ToList();
+
+                        var documentViewModel = new DocumentUploadViewModel
+                        {
+                            Documents = documents,
+                            FileUpload = new BufferedSingleFileUploadDb(),
+                            ProjectId = viewModel.ProjectId,
+                        };
+
+                        return View("Index", documentViewModel);
+                    }
                 }
-            }
 
+                /// Get project documents
+                var filteredDocuments = _context.Documents
+                    .Where(d => d.ProjectId == viewModel.ProjectId)
+                    .Select(d => new DocumentViewModel
+                    {
+                        Name = d.Name,
+                        FileSize = d.FileSize,
+                        UploadDate = d.UploadDate,
+                    })
+                    .ToList();
+
+                var documentUploadViewModel = new DocumentUploadViewModel
+                {
+                    Documents = filteredDocuments,
+                    FileUpload = new BufferedSingleFileUploadDb(),
+                    ProjectId = viewModel.ProjectId,
+                };
+
+                return View("Index", documentUploadViewModel);
+            }
             /// Get project documents
-            var filteredDocuments = _context.Documents
+            var Documents = _context.Documents
                 .Where(d => d.ProjectId == viewModel.ProjectId)
                 .Select(d => new DocumentViewModel
                 {
@@ -147,14 +169,14 @@ namespace ProductManager.Controllers
                 })
                 .ToList();
 
-            var documentUploadViewModel = new DocumentUploadViewModel
+            var ViewModel = new DocumentUploadViewModel
             {
-                Documents = filteredDocuments,
+                Documents = Documents,
                 FileUpload = new BufferedSingleFileUploadDb(),
                 ProjectId = viewModel.ProjectId,
             };
 
-            return View("Index", documentUploadViewModel);
+            return View("Index", ViewModel);
         }
 
 
