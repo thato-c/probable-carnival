@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
+using ProductManager.Models;
+using ProductManager.ViewModels;
 
 namespace ProductManager.Controllers
 {
@@ -13,7 +16,7 @@ namespace ProductManager.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             // Get project Name
             string currentUserProjectName = GetCurrentUserProjectName();
@@ -21,17 +24,29 @@ namespace ProductManager.Controllers
             try
             {
                 // Get projectId
-                var projectId = await _context.Projects
+                var projectId = _context.Projects
                     .Where(p => p.Name == currentUserProjectName)
                     .Select(p => p.ProjectId)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefault();
 
                 // Get project documents
                 var filteredDocuments = _context.Documents
                     .Where(d => d.ProjectId == projectId)
-                    .ToListAsync();
+                    .ToList();
 
-                return View(await filteredDocuments);
+                var documentUploadViewModel = new DocumentUploadViewModel
+                {
+                    Documents = new List<DocumentViewModel>(),
+                    FileUpload = new BufferedSingleFileUploadDb(),
+                    ProjectId = projectId,
+                };
+
+                for (int i = 0; i < filteredDocuments.Count; i++)
+                {
+                    documentUploadViewModel.Documents.Add(new DocumentViewModel());
+                }
+
+                return View(documentUploadViewModel);
             }
             catch (DbUpdateException ex)
             {
@@ -45,7 +60,7 @@ namespace ProductManager.Controllers
                 ModelState.AddModelError("", "An error occurred while retrieving data from the database.");
                 return View();
             }
-            
+
         }
 
         public string GetCurrentUserProjectName()
@@ -70,5 +85,55 @@ namespace ProductManager.Controllers
                 return null;
             }
         }
+
+        public async Task<IActionResult> UploadFile(DocumentUploadViewModel viewModel)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await viewModel.FileUpload.FormFile.CopyToAsync(memoryStream);
+
+                // Upload the file if less thsn 2MB
+                if (memoryStream.Length < 2097152)
+                {
+                    var file = new Models.Document()
+                    {
+                        Name = "Document1",
+                        FileSize = memoryStream.Length,
+                        UploadDate = DateTime.Now,
+                        FileURL = "Database",
+                        ProjectId = viewModel.ProjectId,
+                        //Content = memoryStream.ToArray()
+                    };
+
+                    _context.Documents.Add(file);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    ModelState.AddModelError("File", "The file is too large");
+                }
+            }
+
+            // Get project documents
+            var filteredDocuments = _context.Documents
+                .Where(d => d.ProjectId == viewModel.ProjectId)
+                .ToList();
+
+            var documentUploadViewModel = new DocumentUploadViewModel
+            {
+                Documents = new List<DocumentViewModel>(),
+                FileUpload = new BufferedSingleFileUploadDb(),
+                ProjectId = viewModel.ProjectId,
+            };
+
+            for (int i = 0; i < filteredDocuments.Count; i++)
+            {
+                documentUploadViewModel.Documents.Add(new DocumentViewModel());
+            }
+
+            return View("Index", documentUploadViewModel);
+        }
+
+
     }
 }
