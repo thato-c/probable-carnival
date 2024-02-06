@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
@@ -32,19 +33,20 @@ namespace ProductManager.Controllers
                 // Get project documents
                 var filteredDocuments = _context.Documents
                     .Where(d => d.ProjectId == projectId)
+                    .Select(d => new DocumentViewModel
+                    {
+                        Name = d.Name,
+                        FileSize = d.FileSize,
+                        UploadDate = d.UploadDate,
+                    })
                     .ToList();
 
                 var documentUploadViewModel = new DocumentUploadViewModel
                 {
-                    Documents = new List<DocumentViewModel>(),
+                    Documents = filteredDocuments,
                     FileUpload = new BufferedSingleFileUploadDb(),
                     ProjectId = projectId,
                 };
-
-                for (int i = 0; i < filteredDocuments.Count; i++)
-                {
-                    documentUploadViewModel.Documents.Add(new DocumentViewModel());
-                }
 
                 return View(documentUploadViewModel);
             }
@@ -92,7 +94,7 @@ namespace ProductManager.Controllers
             {
                 await viewModel.FileUpload.FormFile.CopyToAsync(memoryStream);
 
-                // Upload the file if less thsn 2MB
+                // Upload the file if less than 2MB
                 if (memoryStream.Length < 2097152)
                 {
                     var file = new Models.Document()
@@ -111,25 +113,46 @@ namespace ProductManager.Controllers
                 else
                 {
                     ModelState.AddModelError("File", "The file is too large");
+
+                    /// Get project documents
+                    var documents = _context.Documents
+                        .Where(d => d.ProjectId == viewModel.ProjectId)
+                        .Select(d => new DocumentViewModel
+                        {
+                            Name = d.Name,
+                            FileSize = d.FileSize,
+                            UploadDate = d.UploadDate,
+                        })
+                        .ToList();
+
+                    var documentViewModel = new DocumentUploadViewModel
+                    {
+                        Documents = documents,
+                        FileUpload = new BufferedSingleFileUploadDb(),
+                        ProjectId = viewModel.ProjectId,
+                    };
+
+                    return View("Index", documentViewModel);
                 }
             }
 
-            // Get project documents
+            /// Get project documents
             var filteredDocuments = _context.Documents
                 .Where(d => d.ProjectId == viewModel.ProjectId)
+                .Select(d => new DocumentViewModel
+                {
+                    Name = d.Name,
+                    FileSize = d.FileSize,
+                    UploadDate = d.UploadDate,
+                })
                 .ToList();
 
             var documentUploadViewModel = new DocumentUploadViewModel
             {
-                Documents = new List<DocumentViewModel>(),
+                Documents = filteredDocuments,
                 FileUpload = new BufferedSingleFileUploadDb(),
                 ProjectId = viewModel.ProjectId,
             };
-
-            for (int i = 0; i < filteredDocuments.Count; i++)
-            {
-                documentUploadViewModel.Documents.Add(new DocumentViewModel());
-            }
 
             return View("Index", documentUploadViewModel);
         }
