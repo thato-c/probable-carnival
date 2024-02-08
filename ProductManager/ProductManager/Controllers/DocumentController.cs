@@ -5,16 +5,19 @@ using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
 using ProductManager.Models;
 using ProductManager.ViewModels;
+using System.Linq.Expressions;
 
 namespace ProductManager.Controllers
 {
     public class DocumentController : Controller
     {
         public readonly ApplicationDBContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public DocumentController(ApplicationDBContext context)
+        public DocumentController(ApplicationDBContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
         }
 
         public IActionResult Index()
@@ -114,27 +117,30 @@ namespace ProductManager.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError("", "The file is too large");
+                        // Generate a unique name
+                        var fileName = $"{Guid.NewGuid().ToString()}{Path.GetExtension(viewModel.DocumentName)}";
 
-                        /// Get project documents
-                        var documents = _context.Documents
-                            .Where(d => d.ProjectId == viewModel.ProjectId)
-                            .Select(d => new DocumentViewModel
-                            {
-                                Name = d.Name,
-                                FileSize = d.FileSize,
-                                UploadDate = d.UploadDate,
-                            })
-                            .ToList();
+                        // Determine the filePath
+                        var filePath = Path.Combine(_hostEnvironment.WebRootPath, "documents", fileName);
 
-                        var documentViewModel = new DocumentUploadViewModel
+                        // Save the file to the fileSystem
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
                         {
-                            Documents = documents,
-                            FileUpload = new BufferedSingleFileUploadDb(),
+                            await memoryStream.CopyToAsync(fileStream);
+                        }
+
+                        // Save the document details to the database
+                        var document = new Models.Document()
+                        {
+                            Name = viewModel.DocumentName,
+                            FileSize = memoryStream.Length,
+                            UploadDate = DateTime.Now,
+                            FileURL = filePath,
                             ProjectId = viewModel.ProjectId,
                         };
 
-                        return View("Index", documentViewModel);
+                        _context.Documents.Add(document);
+                        await _context.SaveChangesAsync();
                     }
                 }
 
