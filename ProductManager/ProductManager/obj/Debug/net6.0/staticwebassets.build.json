@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "FsgmcaNcz8Ak5VsMhaE4XIyMQiZP9/I5XU/pvjxaegQ=",
+  "Hash": "YpcXE9CY+eKOhIKSCuxh4CMwgA1UDoQWzh2IS1mOMio=",
   "Source": "ProductManager",
   "BasePath": "_content/ProductManager",
   "Mode": "Default",
@@ -66,6 +66,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
+    },
+    {
+      "Identity": "C:\\Users\\tchit\\OneDrive\\probable-carnival\\ProductManager\\ProductManager\\wwwroot\\documents\\9e6d41b7-3008-4a4d-8a0d-4c5b2fe31032",
+      "SourceId": "ProductManager",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\tchit\\OneDrive\\probable-carnival\\ProductManager\\ProductManager\\wwwroot\\",
+      "BasePath": "_content/ProductManager",
+      "RelativePath": "documents/9e6d41b7-3008-4a4d-8a0d-4c5b2fe31032",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\documents\\9e6d41b7-3008-4a4d-8a0d-4c5b2fe31032"
     },
     {
       "Identity": "C:\\Users\\tchit\\OneDrive\\probable-carnival\\ProductManager\\ProductManager\\wwwroot\\favicon.ico",

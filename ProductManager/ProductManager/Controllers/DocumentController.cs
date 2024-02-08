@@ -109,7 +109,7 @@ namespace ProductManager.Controllers
                             UploadDate = DateTime.Now,
                             FileURL = "Database",
                             ProjectId = viewModel.ProjectId,
-                            //Content = memoryStream.ToArray()
+                            Content = memoryStream.ToArray()
                         };
 
                         _context.Documents.Add(file);
