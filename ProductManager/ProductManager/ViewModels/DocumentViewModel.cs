@@ -5,6 +5,8 @@ namespace ProductManager.ViewModels
 {
     public class DocumentViewModel
     {
+        public int FileId { get; set; }
+
         public string Name { get; set; }
 
         public long FileSize { get; set; }

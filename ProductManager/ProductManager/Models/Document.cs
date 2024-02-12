@@ -14,7 +14,7 @@ namespace ProductManager.Models
 
         public string FileURL { get; set; }
 
-        public byte[] Content { get; set; }
+        public byte[] Content { get; set; } = new byte[0];
 
         public int ProjectId { get; set; }
 

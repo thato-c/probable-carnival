@@ -20,6 +20,7 @@ namespace ProductManager.Controllers
             _hostEnvironment = hostEnvironment;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             // Get project Name
@@ -38,6 +39,7 @@ namespace ProductManager.Controllers
                     .Where(d => d.ProjectId == projectId)
                     .Select(d => new DocumentViewModel
                     {
+                        FileId = d.DocumentId,
                         Name = d.Name,
                         FileSize = d.FileSize,
                         UploadDate = d.UploadDate,
@@ -65,7 +67,6 @@ namespace ProductManager.Controllers
                 ModelState.AddModelError("", "An error occurred while retrieving data from the database.");
                 return View();
             }
-
         }
 
         public string GetCurrentUserProjectName()
@@ -82,19 +83,36 @@ namespace ProductManager.Controllers
                 }
                 else
                 {
+                    // User does not have a projectClaim and should not be authorized
                     return null;
                 }
             }
             else
             {
+                // User is not authenticated
                 return null;
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadFile(DocumentUploadViewModel viewModel)
         {
+            // Ensure the file is a pdf
+            // Scan the file
+            // Change the name
+
+
             if (ModelState.IsValid)
             {
+
+                // Ensure the file is a PDF
+                if (viewModel.FileUpload.FormFile.ContentType != "application/pdf")
+                {
+                    ModelState.AddModelError("", "Only PDF files are allowed.");
+                    return View("Index", viewModel);
+                }
+
                 using (var memoryStream = new MemoryStream())
                 {
                     await viewModel.FileUpload.FormFile.CopyToAsync(memoryStream);
@@ -144,7 +162,7 @@ namespace ProductManager.Controllers
                     }
                 }
 
-                /// Get project documents
+                // Get project documents
                 var filteredDocuments = _context.Documents
                     .Where(d => d.ProjectId == viewModel.ProjectId)
                     .Select(d => new DocumentViewModel
@@ -164,7 +182,7 @@ namespace ProductManager.Controllers
 
                 return View("Index", documentUploadViewModel);
             }
-            /// Get project documents
+            // Get project documents
             var Documents = _context.Documents
                 .Where(d => d.ProjectId == viewModel.ProjectId)
                 .Select(d => new DocumentViewModel
@@ -184,7 +202,5 @@ namespace ProductManager.Controllers
 
             return View("Index", ViewModel);
         }
-
-
     }
 }
