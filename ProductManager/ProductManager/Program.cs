@@ -17,8 +17,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Cookie.HttpOnly = true;
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-        options.LoginPath = "/Login/Index";
-        options.LogoutPath = "/Login/Logout";
+        options.LoginPath = "/Account/Index";
+        options.LogoutPath = "/Account/Logout";
     });
 builder.Services.AddControllersWithViews(q => q.Filters.Add(new AuthorizeFilter()));
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
@@ -44,6 +44,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Login}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Index}/{id?}");
 
 app.Run();

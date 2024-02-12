@@ -69,6 +69,10 @@ namespace ProductManager.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DocumentId"));
 
+                    b.Property<byte[]>("Content")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint");
 

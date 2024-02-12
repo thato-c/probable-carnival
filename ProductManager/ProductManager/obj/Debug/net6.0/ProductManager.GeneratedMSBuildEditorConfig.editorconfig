@@ -15,6 +15,22 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager
 build_property._RazorSourceGeneratorDebug = 
 
+[C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Account/ContactAdmin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxDb250YWN0QWRtaW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Account/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Account/RegistrationSuccess.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3RyYXRpb25TdWNjZXNzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Company/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGFueVxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -53,22 +69,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Licence/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGljZW5jZVxJbmRleC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Login/ContactAdmin.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cQ29udGFjdEFkbWluLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Login/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cSW5kZXguY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Login/Register.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cUmVnaXN0ZXIuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Login/RegistrationSuccess.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cUmVnaXN0cmF0aW9uU3VjY2Vzcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/tchit/OneDrive/probable-carnival/ProductManager/ProductManager/Views/Project/Create.cshtml]

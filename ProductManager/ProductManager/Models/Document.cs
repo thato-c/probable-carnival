@@ -1,4 +1,6 @@
-﻿namespace ProductManager.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProductManager.Models
 {
     public class Document
     {
@@ -11,6 +13,8 @@
         public DateTime UploadDate { get; set; }
 
         public string FileURL { get; set; }
+
+        public byte[] Content { get; set; } = new byte[0];
 
         public int ProjectId { get; set; }
 
