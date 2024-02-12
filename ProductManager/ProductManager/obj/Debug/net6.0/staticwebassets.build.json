@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "q2H288cH2RdeljfOokawsCTT8EXpY+GlPsaUvIsLLUA=",
+  "Hash": "lAyzujhMa+mDZYNCmFnN8gNPRAi61cx+VIDjNyInomw=",
   "Source": "ProductManager",
   "BasePath": "_content/ProductManager",
   "Mode": "Default",
@@ -117,6 +117,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\documents\\9e6d41b7-3008-4a4d-8a0d-4c5b2fe31032"
+    },
+    {
+      "Identity": "C:\\Users\\tchit\\OneDrive\\probable-carnival\\ProductManager\\ProductManager\\wwwroot\\documents\\bc27ff71-ffad-4bd0-806f-e449762db9e3",
+      "SourceId": "ProductManager",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\tchit\\OneDrive\\probable-carnival\\ProductManager\\ProductManager\\wwwroot\\",
+      "BasePath": "_content/ProductManager",
+      "RelativePath": "documents/bc27ff71-ffad-4bd0-806f-e449762db9e3",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\documents\\bc27ff71-ffad-4bd0-806f-e449762db9e3"
     },
     {
       "Identity": "C:\\Users\\tchit\\OneDrive\\probable-carnival\\ProductManager\\ProductManager\\wwwroot\\documents\\db08fb88-1c7c-4f2d-b4f2-4b631608f3e3",
