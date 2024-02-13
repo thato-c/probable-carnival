@@ -14,6 +14,6 @@ namespace ProductManager.ViewModels
             ErrorMessage = "Password must meet the recommended strength.")]
         public string Password { get; set; }
 
-        public int CompanyId { get; set; }
+        public int UserId { get; set; }
     }
 }

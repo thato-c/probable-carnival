@@ -18,12 +18,15 @@ namespace ProductManager.Controllers
         {
             var companyIdentity = getCompanyId();
 
+            var companyName = _context.Companies.Where(c => c.CompanyId == companyIdentity).FirstOrDefault();
+
             var users = _context.Users
                 .Where(u => u.CompanyId == companyIdentity )
                 .ToList();
 
             var userViewModel = new UserViewModel
             {
+                CompanyName = companyName.ToString(),
                 Users = new List<UserRegistrationViewModel>(),
             };
 
@@ -31,6 +34,7 @@ namespace ProductManager.Controllers
             {
                 userViewModel.Users.Add(new UserRegistrationViewModel 
                 {
+                    UserId = user.UserId,
                     Username = user.Username,
                     Password = user.Password,
                 });
