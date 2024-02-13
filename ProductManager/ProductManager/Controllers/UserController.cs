@@ -68,5 +68,49 @@ namespace ProductManager.Controllers
                 return 0;
             }
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(UserRegistrationViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = _context.Users.Where(u => u.UserId == viewModel.UserId).FirstOrDefault();
+
+                if (user != null)
+                {
+                    user.Username = viewModel.Username;
+                    user.Password = viewModel.Password;
+                    _context.Entry(user).State = EntityState.Modified;
+                    _context.SaveChanges();
+                }
+            }
+
+            var companyIdentity = getCompanyId();
+
+            var companyName = _context.Companies.Where(c => c.CompanyId == companyIdentity).FirstOrDefault();
+
+            var users = _context.Users
+                .Where(u => u.CompanyId == companyIdentity)
+                .ToList();
+
+            var userViewModel = new UserViewModel
+            {
+                CompanyName = companyName.ToString(),
+                Users = new List<UserRegistrationViewModel>(),
+            };
+
+            foreach (var user in users)
+            {
+                userViewModel.Users.Add(new UserRegistrationViewModel
+                {
+                    UserId = user.UserId,
+                    Username = user.Username,
+                    Password = user.Password,
+                });
+            }
+
+            return View("Index", userViewModel);
+        }
     }
 }
