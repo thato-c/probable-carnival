@@ -1,0 +1,23 @@
+﻿@model ProductManager.ViewModels.UserViewModel
+@{
+}
+
+<h1>Company Users</h1>
+
+
+
+@foreach(var user in Model.Users)
+{
+    <div style="display: inline-block; width: 500px;">
+        <label>UserName</label>
+        <input class="form-control" value="@user.Username" />
+        <span class="text-danger"></span>
+    </div>
+
+    <div style="display: inline-block; width: 500px;">
+        <label>Password</label>
+        <input value="@user.Password" class="form-control" />
+        <span class="text-danger"></span>
+        <span class="text-success"></span>
+    </div>
+}

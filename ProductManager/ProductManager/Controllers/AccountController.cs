@@ -47,9 +47,9 @@ namespace ProductManager.Controllers
 
                         // Add a ClaimType for username
                         var username = user.Username;
-                        var companyName = user.Company.CompanyName;
+                        var companyId = user.Company.CompanyId;
                         claims.Add(new Claim(ClaimTypes.Name, username.ToString()));
-                        claims.Add(new Claim("CompanyName", companyName.ToString()));
+                        claims.Add(new Claim("CompanyId", companyId.ToString()));
 
                         var userRole = await _context.UserRoles
                             .Include(ur => ur.Role)
