@@ -1,59 +1,42 @@
 ﻿@using System.Text.RegularExpressions
-@model ProductManager.ViewModels.UserViewModel
-@{
-}
+@model List<User>
 
 <h1>Company Users</h1>
 
-
-
-@foreach(var user in Model.Users)
+@if (Model != null)
 {
-    <form asp-controller="User" asp-action="Edit" method="post">
-        <input type="hidden" name="UserId" value="@user.UserId" />
+    <table class="table">
+        <tr>
+            <th>
+                Username
+            </th>
+            <th>
 
-        @{
+            </th>
+        </tr>
+        @foreach (var user in Model)
+        {
             var pattern = $"user";
             bool isSystemGenerated = Regex.IsMatch(user.Username, pattern);
+
+            if (user != null)
+            {
+                <tr>
+                    <td>
+                        @if (isSystemGenerated)
+                        {
+                            <p>To Be Assigned</p>
+                        }
+                        else
+                        {
+                            @user.Username 
+                        }
+                    </td>
+                    <td>
+                        Edit
+                    </td>
+                </tr>
+            }
         }
-        @if (isSystemGenerated)
-        {
-        <div style="display: inline-block; width: 500px;">
-            <label>UserName</label>
-            <input name="Username" class="form-control" />
-            <span class="text-danger"></span>
-        </div>
-
-        <div style="display: inline-block; width: 500px;">
-            <label>Password</label>
-            <input name="Password" class="form-control" />
-            <span class="text-danger"></span>
-        </div>
-
-        <button type="submit">
-            Edit
-        </button>
-        }
-        else 
-        {
-        <div style="display: inline-block; width: 500px;">
-            <label>UserName</label>
-            <input asp-for="" class="form-control" value="@user.Username" />
-            <span class="text-danger"></span>
-        </div>
-
-        <div style="display: inline-block; width: 500px;">
-            <label>Password</label>
-            <div class="input-group">
-                <input type="password" value="@user.Password" class="form-control" />
-                <span class="text-danger"></span>
-            </div>
-        </div>
-
-        <button type="submit">Edit</button>
-        }
-    </form>
-
-    
-
+    </table>
 }

@@ -255,9 +255,9 @@ C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Rele
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Release\net6.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Release\net6.0\scopedcss\bundle\ProductManager.styles.css
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Release\net6.0\scopedcss\projectbundle\ProductManager.bundle.scp.css
-C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Release\net6.0\ProductManager.csproj.CopyComplete
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Release\net6.0\ProductManager.dll
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Release\net6.0\refint\ProductManager.dll
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Release\net6.0\ProductManager.pdb
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Release\net6.0\ProductManager.genruntimeconfig.cache
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Release\net6.0\ref\ProductManager.dll
+C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Release\net6.0\ProductM.F4B8B69F.Up2Date

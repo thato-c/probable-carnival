@@ -74,7 +74,6 @@ C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Debu
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Debug\net6.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Debug\net6.0\scopedcss\bundle\ProductManager.styles.css
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Debug\net6.0\scopedcss\projectbundle\ProductManager.bundle.scp.css
-C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Debug\net6.0\ProductManager.csproj.CopyComplete
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Debug\net6.0\ProductManager.dll
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Debug\net6.0\refint\ProductManager.dll
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Debug\net6.0\ProductManager.pdb
@@ -261,3 +260,4 @@ C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\bin\Debu
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\bin\Debug\net6.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\bin\Debug\net6.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\bin\Debug\net6.0\BCrypt.Net-Next.dll
+C:\Users\tchit\OneDrive\probable-carnival\ProductManager\ProductManager\obj\Debug\net6.0\ProductM.F4B8B69F.Up2Date
