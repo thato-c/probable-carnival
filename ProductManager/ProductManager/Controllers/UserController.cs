@@ -14,6 +14,7 @@ namespace ProductManager.Controllers
             _context = context;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             var companyIdentity = getCompanyId();
@@ -25,6 +26,14 @@ namespace ProductManager.Controllers
                 .ToList();
 
             return View(users);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int UserId)
+        {
+            var user = _context.Users.Where(u => u.UserId == UserId).FirstOrDefault();
+
+            return View(user);
         }
 
         public int getCompanyId()
