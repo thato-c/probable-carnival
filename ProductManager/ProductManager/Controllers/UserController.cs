@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProductManager.Data;
+using ProductManager.Models;
 using ProductManager.ViewModels;
 
 namespace ProductManager.Controllers
@@ -49,7 +50,7 @@ namespace ProductManager.Controllers
                     .ThenInclude(r => r.Role)
                 .FirstOrDefault(u => u.UserId == UserId);
 
-            var roleName = user.UserRoles.FirstOrDefault()?.Role?.Name;
+            var roleName = user.UserRoles.FirstOrDefault()?.Role?.RoleId;
 
             var includedRoles = new List<string> {"Company Administrator", "User"};
 
@@ -66,7 +67,7 @@ namespace ProductManager.Controllers
                 UserId = user.UserId,
                 Username = user.Username,
                 Password = user.Password,
-                SelectedRole = roleName ?? "User",
+                SelectedRole = roleName ?? 5,
                 Roles = roles
             };
 
@@ -79,20 +80,58 @@ namespace ProductManager.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = _context.Users.Where(u => u.UserId == viewModel.UserId)
-                    .FirstOrDefault();
+                var user = _context.Users.Where(u => u.UserId == viewModel.UserId).FirstOrDefault();
+                var userRole = _context.UserRoles.Where(ur => ur.UserId == viewModel.UserId).FirstOrDefault();
 
-                if (user != null)
+                if (user != null && userRole != null)
                 {
                     user.Username = viewModel.Username;
                     user.Password = viewModel.Password;
+                    userRole.RoleId = viewModel.SelectedRole;
+                    try
+                    {
+                        _context.Entry(user).State = EntityState.Modified;
+                        _context.Entry(userRole).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction("Index");
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("", "An error occurred while saving changes: " + ex.Message);
+                    }
                 }
-
-                _context.Entry(user).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
+                else
+                {
+                    ModelState.AddModelError("", "User or user role was not found.");
+                }
             }
-            return View(viewModel);
+
+            var newUser = _context.Users
+                .Include(ur => ur.UserRoles)
+            .ThenInclude(r => r.Role)
+                .FirstOrDefault(u => u.UserId == viewModel.UserId);
+
+            var roleName = newUser.UserRoles.FirstOrDefault()?.Role?.RoleId;
+
+            var includedRoles = new List<string> { "Company Administrator", "User" };
+
+            var roles = await _context.Roles
+                .Where(r => includedRoles.Contains(r.Name))
+                .Select(r => new LicenceDropDownItem
+                {
+                    Value = r.RoleId.ToString(),
+                    Text = r.Name.ToString(),
+                }).ToListAsync();
+
+            var NewUser = new UserRegistrationViewModel
+            {
+                UserId = newUser.UserId,
+                Username = newUser.Username,
+                Password = newUser.Password,
+                SelectedRole = roleName ?? 5,
+                Roles = roles
+            };
+            return View(NewUser);
         }
 
         public int getCompanyId()

@@ -6,7 +6,7 @@
 
 <form asp-controller="User" asp-action="Edit" method="post">
     @Html.AntiForgeryToken()
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="UserId" />
 
     <div class="form-group">
@@ -29,7 +29,7 @@
             {
                 foreach (var role in Model.Roles)
                 {
-                    <option value="@role.Value" selected=@(Model.SelectedRole == role.Text ? "selected" : "")>@role.Text</option>
+                    <option value="@role.Value" >@role.Text</option>
                 }
             }
         </select>

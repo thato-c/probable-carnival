@@ -4,6 +4,12 @@ namespace ProductManager.ViewModels
 {
     public class UserRegistrationViewModel
     {
+
+        public UserRegistrationViewModel() 
+        {
+            Roles = new List<LicenceDropDownItem>();
+        }
+
         [Required(ErrorMessage = "Username is required")]
         [EmailAddress]
         public string Username { get; set; }
@@ -15,7 +21,7 @@ namespace ProductManager.ViewModels
         public string Password { get; set; }
 
         [Required(ErrorMessage = "User Role is required")]
-        public string SelectedRole { get; set; }
+        public int SelectedRole { get; set; }
 
         public IEnumerable<LicenceDropDownItem> Roles { get; set; }
 

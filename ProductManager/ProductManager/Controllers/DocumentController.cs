@@ -102,7 +102,6 @@ namespace ProductManager.Controllers
             // Scan the file
             // Change the name
 
-
             if (ModelState.IsValid)
             {
 
