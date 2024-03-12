@@ -14,6 +14,11 @@ namespace ProductManager.ViewModels
             ErrorMessage = "Password must meet the recommended strength.")]
         public string Password { get; set; }
 
+        [Required(ErrorMessage = "User Role is required")]
+        public string SelectedRole { get; set; }
+
+        public IEnumerable<LicenceDropDownItem> Roles { get; set; }
+
         public int UserId { get; set; }
     }
 }

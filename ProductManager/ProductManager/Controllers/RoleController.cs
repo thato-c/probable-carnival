@@ -70,7 +70,6 @@ namespace ProductManager.Controllers
 
                     return RedirectToAction("Index");
                 }
-
                 return View(model);
             }
             catch (DbUpdateException ex)
@@ -85,7 +84,6 @@ namespace ProductManager.Controllers
                 ModelState.AddModelError("", "An error occurred while saving data to the database.");
                 return View();
             }
-            
         }
     }
 }

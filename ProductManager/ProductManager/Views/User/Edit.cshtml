@@ -1,7 +1,41 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model ProductManager.ViewModels.UserRegistrationViewModel
 @{
 }
 
 <h1>Edit Users</h1>
+
+<form asp-controller="User" asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="UserId" />
+
+    <div class="form-group">
+        <label asp-for="Username">Username</label>
+        <input asp-for="Username" class="form-control"/>
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Password">Password</label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+        <span id="passwordStrengthMessage" class="text-success"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SelectedRole">Role Name</label>
+        <select asp-for="SelectedRole" class="form-control">
+            @if (Model != null && Model.Roles != null)
+            {
+                foreach (var role in Model.Roles)
+                {
+                    <option value="@role.Value" selected=@(Model.SelectedRole == role.Text ? "selected" : "")>@role.Text</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="SelectedRole" class="text-danger"></span>
+    </div>
+
+
+    <button type="submit">Edit</button>
+</form>

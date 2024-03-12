@@ -11,6 +11,9 @@
                 Username
             </th>
             <th>
+                Role
+            </th>
+            <th>
 
             </th>
         </tr>
@@ -31,6 +34,9 @@
                         {
                             @user.Username 
                         }
+                    </td>
+                    <td>
+                        @ViewBag.UserRoles[user.UserId]
                     </td>
                     <td>
                         <a asp-asp-controller="User" asp-action="Edit" asp-route-UserId="@user.UserId">Edit</a>
