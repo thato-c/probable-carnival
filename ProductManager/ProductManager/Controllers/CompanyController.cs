@@ -221,6 +221,14 @@ namespace ProductManager.Controllers
 
                             // Add User
                             _context.Users.Add(user);
+                            await _context.SaveChangesAsync();
+
+                            var userRole = new Models.UserRole
+                            {
+                                UserId = user.UserId,
+                                RoleId = 5,
+                            };
+                            _context.UserRoles.Add(userRole);
                         }
                         await _context.SaveChangesAsync();
 
@@ -386,6 +394,15 @@ namespace ProductManager.Controllers
                                     Password = GenerateUserPassword(),
                                 };
                                 _context.Users.Add(user);
+                                await _context.SaveChangesAsync();
+
+
+                                var userRole = new Models.UserRole
+                                {
+                                    UserId = user.UserId,
+                                    RoleId = 5,
+                                };
+                                _context.UserRoles.Add(userRole);
                             }
 
                         }
@@ -446,6 +463,14 @@ namespace ProductManager.Controllers
                                     };
                                     // Add User
                                     _context.Users.Add(user);
+                                    await _context.SaveChangesAsync();
+
+                                    var userRole = new Models.UserRole
+                                    {
+                                        UserId = user.UserId,
+                                        RoleId = 5,
+                                    };
+                                    _context.UserRoles.Add(userRole);
                                 }
                             }
                             else if (newUsers < 0)
