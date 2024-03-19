@@ -49,3 +49,8 @@ body {
     .menu a{
         margin: 6px 0;
     }
+
+    .user{
+        font-size: x-small;
+        color: white;
+    }
