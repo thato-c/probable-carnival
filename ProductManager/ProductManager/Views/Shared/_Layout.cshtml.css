@@ -7,9 +7,6 @@ a.navbar-brand {
   word-break: break-all;
 }
 
-a {
-  color: #0077cc;
-}
 
 .btn-primary {
   color: #fff;
@@ -40,9 +37,13 @@ button.accept-policy {
 }
 
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
+    background-color: #1D4E89;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 5%;
+    white-space: nowrap;
+    line-height: 33px;
+    text-align: center;
+    color: white;
 }
